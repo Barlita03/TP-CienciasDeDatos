@@ -8,6 +8,7 @@ Repositorio grupal del TP1 de Ciencia de Datos: predecir el sentimiento de tweet
 - **No agregar ninguna información sin consultarla antes.** Proponer, esperar confirmación y recién ahí escribir.
 - **Si no aporta, no se agrega.** Nada de secciones o datos de relleno (integrantes, docentes, fechas, etc.).
 - Ir de a un punto por vez, con cambios chicos y fáciles de revisar.
+- Ignorar la carpeta `Otros/`: es material adicional del grupo y no forma parte del trabajo.
 
 ## Reglas del repo que hay que respetar
 
