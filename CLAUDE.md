@@ -11,7 +11,7 @@ Repositorio grupal del TP1 de Ciencia de Datos: predecir el sentimiento de tweet
 
 ## Reglas del repo que hay que respetar
 
-- Toda propuesta (análisis, preprocesamiento, feature, modelo) se prueba y se deja su evidencia y justificación, aprobada o descartada, en [Docs/JUSTIFICACIONES.md](Docs/JUSTIFICACIONES.md). Todas las propuestas, incluidas las descartadas, tienen que mencionarse al menos en el notebook.
+- Toda propuesta (análisis, preprocesamiento, feature, modelo) se prueba y se deja su evidencia y justificación, aprobada o descartada, en [Docs/JUSTIFICACIONES.md](Docs/JUSTIFICACIONES.md). Todas las propuestas, incluidas las descartadas, tienen que figurar con su código en el notebook.
 - Todo cambio entra por PR y se mergea solo con la aprobación de todos los integrantes.
 - El avance se sigue en [Docs/AVANCE.md](Docs/AVANCE.md): una subtarea se tilda recién cuando su PR está mergeada.
 - Cada subtarea pendiente tiene un issue en GitHub con la etiqueta de su etapa. Quien la toma se asigna el issue.

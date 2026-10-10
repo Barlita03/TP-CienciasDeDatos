@@ -2,7 +2,7 @@
 
 Registro de todas las propuestas que probamos (análisis, preprocesamiento, features, modelos), tanto las aprobadas como las descartadas, con la evidencia que respalda cada decisión.
 
-Todas las propuestas, incluidas las descartadas, tienen que mencionarse al menos en el notebook, para que se vea qué probamos y por qué tomamos cada decisión.
+Todas las propuestas, incluidas las descartadas, tienen que figurar con su código en el notebook, para que se vea qué probamos y por qué tomamos cada decisión.
 
 ## Cómo agregar una entrada
 

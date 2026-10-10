@@ -20,6 +20,7 @@ La consigna completa está en [Consigna/Consigna.pdf](Consigna/Consigna.pdf).
 │   ├── Consigna.pdf       # Enunciado del TP
 │   └── ia_tweets.csv      # Dataset
 ├── Clases/                # Material de las clases (PDFs y links a las grabaciones)
+├── Otros/                 # Material de apoyo
 └── Docs/
     ├── AVANCE.md          # Tablero de avance por etapa
     ├── CONTRIBUTING.md    # Cómo colaboramos (ramas, commits, PRs)
@@ -33,5 +34,5 @@ El estado de cada etapa y subtarea está en [Docs/AVANCE.md](Docs/AVANCE.md).
 
 ## Normas generales
 
-1. **Toda propuesta se prueba y se documenta.** Cualquier idea de análisis, preprocesamiento, feature o modelo se prueba antes de adoptarse. La evidencia y la justificación de por qué se aprobó o se descartó quedan en [Docs/JUSTIFICACIONES.md](Docs/JUSTIFICACIONES.md), y todas las propuestas, incluidas las descartadas, tienen que mencionarse al menos en el notebook.
+1. **Toda propuesta se prueba y se documenta.** Cualquier idea de análisis, preprocesamiento, feature o modelo se prueba antes de adoptarse. La evidencia y la justificación de por qué se aprobó o se descartó quedan en [Docs/JUSTIFICACIONES.md](Docs/JUSTIFICACIONES.md), y todas las propuestas, incluidas las descartadas, tienen que figurar con su código en el notebook.
 2. **Nada avanza sin la aprobación de todos.** Cada cambio entra por una Pull Request y se mergea solo cuando la aprobaron todos los integrantes. El detalle del flujo está en [Docs/CONTRIBUTING.md](Docs/CONTRIBUTING.md).

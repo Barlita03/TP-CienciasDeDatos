@@ -37,7 +37,11 @@ Para git, el notebook es un JSON enorme, así que dos cambios al mismo tiempo ca
 - Antes de abrir la PR, traer lo último de `main` a la rama.
 - Si hay conflicto, no editar el JSON a mano. Quedarse con la versión de `main` y volver a agregar las celdas propias.
 
-## Subtareas nuevas
+## Tablero de avance
+
+Una subtarea de [AVANCE.md](AVANCE.md) se tilda recién cuando la PR que la resuelve está mergeada.
+
+### Subtareas nuevas
 
 Para sumar una subtarea que no estaba en el tablero:
 

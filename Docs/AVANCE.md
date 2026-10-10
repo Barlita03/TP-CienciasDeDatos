@@ -1,9 +1,6 @@
 # Avance del TP
 
-Las etapas salen de los títulos de la consigna y las subtareas, de los ítems de cada título.
-
-- Una subtarea se tilda (`[x]`) recién cuando la PR que la resuelve está mergeada.
-- Se pueden sumar subtareas propias debajo de la etapa que corresponda. Se agregan por PR, como cualquier otro cambio.
+Las etapas 1 a 6 salen de los títulos de los Lineamientos de la consigna, y la 7 a la 9, de los Entregables. Cuándo se tilda una subtarea y cómo sumar una nueva está en [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 1. Exploración del dataset
 
@@ -58,6 +55,8 @@ Para cada elemento: decidir si se elimina, se transforma, se construye una featu
 - [ ] Redactar las conclusiones en el notebook ([#22](https://github.com/Barlita03/TP-CienciasDeDatos/issues/22))
 
 ## 8. Uso de IA
+
+Se arma a partir del campo "Uso de IA" de cada PR.
 
 - [ ] Redactar la sección final del notebook: en qué partes del proceso se usó IA y con qué fin ([#23](https://github.com/Barlita03/TP-CienciasDeDatos/issues/23))
 
