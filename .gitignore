@@ -1,0 +1,9 @@
+# Notebooks de prueba personales
+pruebas/
+prueba_*.ipynb
+
+# Archivos temporales de Jupyter
+.ipynb_checkpoints/
+
+# Entorno virtual para correr local
+.venv/
