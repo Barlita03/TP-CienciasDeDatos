@@ -19,4 +19,5 @@ Línea de tiempo de los cambios del proyecto.
 ---
 
 ## 2026-10-10
+- Indica a Claude que ignore la carpeta Otros (#29)
 - Arma la documentación y organización inicial del TP
