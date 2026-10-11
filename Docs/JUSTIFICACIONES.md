@@ -28,6 +28,15 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ## 2. Análisis de las variables disponibles
 
+### J-01 · Mantener los tweets con muchos likes y analizarlos en escala logarítmica
+- **Etapa:** 2. Análisis de las variables disponibles
+- **Issue / PR:** #1, #2, #3 / pendiente
+- **Propuesta:** tratar los tweets con muchos likes como outliers según el criterio IQR, o mantenerlos y analizar `favorite_count` en escala `log(1 + x)`.
+- **Cómo se probó:** se aplicó el criterio IQR a `favorite_count` y se comparó la media de likes por clase con y sin el tweet con más likes.
+- **Evidencia:** el 53.15% de los tweets tiene 0 likes, la mediana es 0 y el máximo, 2243. Como Q1 = 0 y Q3 = 1, el IQR marca como outliers a 678 tweets (16.79%), todos los que tienen 3 likes o más. Con todos los datos, la media de los positivos (5.02) supera a la de los negativos (2.97); sin el tweet con más likes (2243, positivo) baja a 2.06 y queda por debajo de los negativos (2.97) y de los neutrales (3.66).
+- **Decisión:** ✅ Aprobada (mantener los tweets y usar escala logarítmica)
+- **Justificación:** con una distribución tan sesgada, el criterio IQR marca como outlier a casi cualquier tweet con interacción, y esos valores son reales, no errores. Eliminarlos borraría la parte más informativa de la variable. La escala logarítmica reduce el peso de los valores extremos sin descartarlos, y la comparación por clase muestra que la media sola puede llevar a una conclusión equivocada.
+
 ## 3. Ingeniería de features
 
 ## 4. Preprocesamiento de texto
