@@ -30,7 +30,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-01 · Histograma sin transformar y normalización min-max para graficar `favorite_count` y `retweet_count`
 - **Etapa:** 2. Análisis de las variables disponibles
-- **Issue / PR:** #1 / PR pendiente
+- **Issue / PR:** #1 / #30
 - **Propuesta:** graficar las métricas de interacción con un histograma común y, para mejorar la visualización, normalizarlas con min-max.
 - **Cómo se probó:** histograma de cada variable sin transformar y de su versión normalizada con (x − min) / (max − min), y porcentaje de datos que cae en el primer bin.
 - **Evidencia:** sin transformar, el 99,55% de `favorite_count` y el 99,11% de `retweet_count` cae en el primer bin. Con min-max los porcentajes son los mismos y el histograma tiene la misma forma, solo cambia el eje X a [0, 1].
@@ -39,7 +39,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-02 · Transformación `log1p` con todos los datos (opción A)
 - **Etapa:** 2. Análisis de las variables disponibles
-- **Issue / PR:** #1 / PR pendiente
+- **Issue / PR:** #1 / #30
 - **Propuesta:** graficar `log1p(x)` = log(1 + x) de todos los tweets, para comprimir la cola. Se usa `log1p` y no `log` porque la mayoría de los valores son 0 y log(0) no existe.
 - **Cómo se probó:** histograma de `log1p` de cada variable, junto con el porcentaje de ceros y el resumen estadístico.
 - **Evidencia:** el 53,15% de los tweets tiene 0 favoritos y el 84,74% tiene 0 retweets. Media vs. mediana: 3,82 vs. 0 en favoritos y 0,87 vs. 0 en retweets. El máximo es 2243 en favoritos y 502 en retweets.
@@ -48,7 +48,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-03 · Filtrar los tweets con interacción y usar eje logarítmico (opción B)
 - **Etapa:** 2. Análisis de las variables disponibles
-- **Issue / PR:** #1 / PR pendiente
+- **Issue / PR:** #1 / #30
 - **Propuesta:** graficar solo los tweets con valor mayor a 0, con el eje X en escala logarítmica, para ver la forma de la distribución sin que los ceros la tapen.
 - **Cómo se probó:** histograma con `log_scale=True` de los valores mayores a 0 de cada variable, y resumen de esos valores.
 - **Evidencia:** hay 1892 tweets con favoritos (46,85% del total) y 616 con retweets (15,26%). En ambos casos la mediana es 2. El percentil 90 es 10 en favoritos y 8,5 en retweets.
@@ -57,7 +57,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-04 · Comparar la proporción de tweets con interacción y los percentiles de los tweets con interacción por clase
 - **Etapa:** 2. Análisis de las variables disponibles
-- **Issue / PR:** #2 / PR pendiente
+- **Issue / PR:** #2 / #30
 - **Propuesta:** responder si los tweets positivos reciben más interacción que los negativos con dos medidas complementarias: el porcentaje de tweets con valor mayor a 0 (cuántos reciben interacción) y los percentiles 50, 75, 90 y 99 de los tweets con valor mayor a 0 (cuánta reciben). Se incluye la clase NEU como referencia.
 - **Cómo se probó:** cálculo de ambas medidas por clase para `favorite_count` y `retweet_count`.
 - **Evidencia:** tweets con favoritos: P 45,71%, NEU 47,86%, N 43,75%. Tweets con retweets: P 13,34%, NEU 16,03%, N 14,19%. Mediana de los tweets con interacción: favoritos P 1, NEU 2, N 2; retweets P 2, NEU 2, N 1.
@@ -66,7 +66,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-05 · Comparar la media y el máximo de interacción por clase
 - **Etapa:** 2. Análisis de las variables disponibles
-- **Issue / PR:** #2 / PR pendiente
+- **Issue / PR:** #2 / #30
 - **Propuesta:** comparar las clases con la media y el máximo de `favorite_count` y `retweet_count`.
 - **Cómo se probó:** media, mediana y máximo por clase, y media recalculada sin el tweet con el valor máximo de cada clase.
 - **Evidencia:** la media de favoritos de P es 5,02 y la de N, 2,97. Sin el tweet máximo de cada clase, pasan a 2,06 y 2,38. En retweets, de 1,20 y 0,68 pasan a 0,54 y 0,54. El máximo de P es 2243 favoritos, un solo tweet.
@@ -75,7 +75,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-06 · Identificar los outliers de forma descriptiva
 - **Etapa:** 2. Análisis de las variables disponibles
-- **Issue / PR:** #3 / PR pendiente
+- **Issue / PR:** #3 / #30
 - **Propuesta:** responder si se observan outliers sin fijar un umbral, cuantificando qué tan lejos están los valores extremos del resto y verificando que correspondan a valores reales y no a errores de carga.
 - **Cómo se probó:** mínimos de cada métrica, relación entre el máximo y el percentil 99, y revisión de los tweets con más interacción junto con los datos de su cuenta.
 - **Evidencia:** el mínimo de ambas métricas es 0. El máximo es 2243 favoritos y 502 retweets, unas 55 y 34 veces el percentil 99. Los cinco tweets con más favoritos son también los cinco con más retweets, y dos de ellos son de cuentas verificadas con más de 140.000 seguidores (la mediana del dataset es 622).
@@ -84,7 +84,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-07 · Detectar outliers con la regla del IQR y el puntaje z
 - **Etapa:** 2. Análisis de las variables disponibles
-- **Issue / PR:** #3 / PR pendiente
+- **Issue / PR:** #3 / #30
 - **Propuesta:** marcar como outliers los valores mayores que Q3 + 1,5 × (Q3 − Q1), sobre los datos originales y sobre `log1p`, o los que están a más de 3 desvíos estándar por encima de la media.
 - **Cómo se probó:** aplicación de cada regla a `favorite_count` y `retweet_count`, y desvío estándar recalculado sin el tweet con el valor máximo.
 - **Evidencia:** con el IQR, en retweets Q1 = Q3 = 0 y el límite es 0, así que se marca el 15,26% de los tweets (todos los que tienen al menos un retweet); en favoritos se marca el 16,79%. Sobre `log1p`, el límite de retweets sigue en 0 y en favoritos se marca el 10,15%. El puntaje z marca 11 tweets en favoritos y 14 en retweets, pero sacando un solo tweet el desvío de favoritos baja de 45,04 a 28,05.
