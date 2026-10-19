@@ -55,6 +55,42 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Decisión:** ✅ Aprobada, como complemento de J-02
 - **Justificación:** deja ver cómo se reparten los tweets que sí interactúan: la mayoría tiene entre 1 y 2 y la frecuencia cae de forma gradual hasta los extremos. No muestra los ceros, así que hay que aclararlo y acompañarlo con el porcentaje de ceros y la opción A.
 
+### J-04 · Comparar la proporción de tweets con interacción y los percentiles de los tweets con interacción por clase
+- **Etapa:** 2. Análisis de las variables disponibles
+- **Issue / PR:** #2 / PR pendiente
+- **Propuesta:** responder si los tweets positivos reciben más interacción que los negativos con dos medidas complementarias: el porcentaje de tweets con valor mayor a 0 (cuántos reciben interacción) y los percentiles 50, 75, 90 y 99 de los tweets con valor mayor a 0 (cuánta reciben). Se incluye la clase NEU como referencia.
+- **Cómo se probó:** cálculo de ambas medidas por clase para `favorite_count` y `retweet_count`.
+- **Evidencia:** tweets con favoritos: P 45,71%, NEU 47,86%, N 43,75%. Tweets con retweets: P 13,34%, NEU 16,03%, N 14,19%. Mediana de los tweets con interacción: favoritos P 1, NEU 2, N 2; retweets P 2, NEU 2, N 1.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** son medidas relativas, así que no dependen del tamaño de cada clase, y no se ven arrastradas por valores extremos. Muestran diferencias pequeñas cuyo sentido se invierte según el indicador, por lo que no se observa que los positivos reciban más interacción que los negativos.
+
+### J-05 · Comparar la media y el máximo de interacción por clase
+- **Etapa:** 2. Análisis de las variables disponibles
+- **Issue / PR:** #2 / PR pendiente
+- **Propuesta:** comparar las clases con la media y el máximo de `favorite_count` y `retweet_count`.
+- **Cómo se probó:** media, mediana y máximo por clase, y media recalculada sin el tweet con el valor máximo de cada clase.
+- **Evidencia:** la media de favoritos de P es 5,02 y la de N, 2,97. Sin el tweet máximo de cada clase, pasan a 2,06 y 2,38. En retweets, de 1,20 y 0,68 pasan a 0,54 y 0,54. El máximo de P es 2243 favoritos, un solo tweet.
+- **Decisión:** ❌ Descartada
+- **Justificación:** quitando un solo tweet, la media cambia de sentido. El máximo representa un único tweet y depende del tamaño del grupo. Ninguna de las dos describe el comportamiento de la clase.
+
+### J-06 · Identificar los outliers de forma descriptiva
+- **Etapa:** 2. Análisis de las variables disponibles
+- **Issue / PR:** #3 / PR pendiente
+- **Propuesta:** responder si se observan outliers sin fijar un umbral, cuantificando qué tan lejos están los valores extremos del resto y verificando que correspondan a valores reales y no a errores de carga.
+- **Cómo se probó:** mínimos de cada métrica, relación entre el máximo y el percentil 99, y revisión de los tweets con más interacción junto con los datos de su cuenta.
+- **Evidencia:** el mínimo de ambas métricas es 0. El máximo es 2243 favoritos y 502 retweets, unas 55 y 34 veces el percentil 99. Los cinco tweets con más favoritos son también los cinco con más retweets, y dos de ellos son de cuentas verificadas con más de 140.000 seguidores (la mediana del dataset es 622).
+- **Decisión:** ✅ Aprobada
+- **Justificación:** las reglas automáticas no dan un criterio confiable para esta distribución (J-07), y un corte por percentil depende de un umbral arbitrario (p95, p98 o p99 dan respuestas distintas). La evidencia muestra que hay outliers y que son tweets reales con alta difusión, parte de la cola larga de la distribución. Se resigna una lista exacta de outliers, que no hace falta para responder la pregunta; su tratamiento se decide en el modelado.
+
+### J-07 · Detectar outliers con la regla del IQR y el puntaje z
+- **Etapa:** 2. Análisis de las variables disponibles
+- **Issue / PR:** #3 / PR pendiente
+- **Propuesta:** marcar como outliers los valores mayores que Q3 + 1,5 × (Q3 − Q1), sobre los datos originales y sobre `log1p`, o los que están a más de 3 desvíos estándar por encima de la media.
+- **Cómo se probó:** aplicación de cada regla a `favorite_count` y `retweet_count`, y desvío estándar recalculado sin el tweet con el valor máximo.
+- **Evidencia:** con el IQR, en retweets Q1 = Q3 = 0 y el límite es 0, así que se marca el 15,26% de los tweets (todos los que tienen al menos un retweet); en favoritos se marca el 16,79%. Sobre `log1p`, el límite de retweets sigue en 0 y en favoritos se marca el 10,15%. El puntaje z marca 11 tweets en favoritos y 14 en retweets, pero sacando un solo tweet el desvío de favoritos baja de 45,04 a 28,05.
+- **Decisión:** ❌ Descartada
+- **Justificación:** el IQR colapsa porque la mayoría de los valores es 0. El puntaje z supone una distribución aproximadamente normal, y su límite depende de la media y el desvío, que se calculan con los mismos extremos que busca detectar.
+
 ## 3. Ingeniería de features
 
 ## 4. Preprocesamiento de texto

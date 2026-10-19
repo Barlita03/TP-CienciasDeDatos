@@ -14,9 +14,9 @@ Las etapas 1 a 6 salen de los títulos de los Lineamientos de la consigna, y la 
 
 ## 2. Análisis de las variables disponibles
 
-- [ ] ¿Qué distribución tienen las métricas de interacción? ([#1](https://github.com/Barlita03/TP-CienciasDeDatos/issues/1))
-- [ ] ¿Los tweets positivos reciben más interacción que los negativos? ([#2](https://github.com/Barlita03/TP-CienciasDeDatos/issues/2))
-- [ ] ¿Se observan outliers? ([#3](https://github.com/Barlita03/TP-CienciasDeDatos/issues/3))
+- [x] ¿Qué distribución tienen las métricas de interacción? ([#1](https://github.com/Barlita03/TP-CienciasDeDatos/issues/1))
+- [x] ¿Los tweets positivos reciben más interacción que los negativos? ([#2](https://github.com/Barlita03/TP-CienciasDeDatos/issues/2))
+- [x] ¿Se observan outliers? ([#3](https://github.com/Barlita03/TP-CienciasDeDatos/issues/3))
 
 ## 3. Ingeniería de features
 
