@@ -91,6 +91,24 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Decisión:** ❌ Descartada
 - **Justificación:** el IQR colapsa porque la mayoría de los valores es 0. El puntaje z supone una distribución aproximadamente normal, y su límite depende de la media y el desvío, que se calculan con los mismos extremos que busca detectar.
 
+### J-08 · Relacionar la interacción con el tamaño de la cuenta
+- **Etapa:** 2. Análisis de las variables disponibles
+- **Issue / PR:** #2 / #30
+- **Propuesta:** complementar la respuesta del #2 analizando si la interacción depende de la cuenta que publica el tweet: correlación con `user_followers_count` y comparación de la proporción de clases y la mediana de seguidores en distintos niveles de interacción.
+- **Cómo se probó:** correlación de Pearson sobre `log1p` entre `favorite_count`, `retweet_count` y `user_followers_count`. Proporción de clases y mediana de seguidores en los tweets sin interacción, con interacción, en el 5% y en el 1% con más interacción, para `favorite_count` y `retweet_count`.
+- **Evidencia:** sobre `log1p`, la correlación con los seguidores es 0,41 en favoritos y 0,33 en retweets. La mediana de seguidores pasa de 274 (sin favoritos) a 18.932 (1% con más favoritos) y de 473 (sin retweets) a 25.586 (1% con más retweets), mientras que la proporción de clases queda a no más de 4 puntos de la del dataset completo (P 18,7%, NEU 66,6%, N 14,7%) en todos los cortes.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** se usa `log1p` porque sobre los valores originales la correlación queda dominada por los extremos (J-09). Usar varios cortes evita depender de un único umbral arbitrario para definir un tweet viral (J-06). El resultado muestra que la interacción está asociada al tamaño de la cuenta y no al sentimiento, lo que refuerza la conclusión de J-04 y explica el origen de los valores extremos (J-06).
+
+### J-09 · Calcular la correlación con los seguidores sobre los valores originales
+- **Etapa:** 2. Análisis de las variables disponibles
+- **Issue / PR:** #2 / #30
+- **Propuesta:** medir la relación entre la interacción y los seguidores con la correlación de Pearson sobre los valores originales, sin transformar.
+- **Cómo se probó:** matriz de correlación de `favorite_count`, `retweet_count` y `user_followers_count` sin transformar, comparada con la calculada sobre `log1p` (J-08), y recalculada sin el tweet con más favoritos.
+- **Evidencia:** sin transformar, la correlación con los seguidores es 0,04 en favoritos y 0,05 en retweets, frente a 0,41 y 0,33 sobre `log1p`. Entre favoritos y retweets es 0,94, y quitar solo el tweet con más favoritos la baja a 0,84. La cuenta con más seguidores (más de 10 millones) tiene apenas 35 favoritos.
+- **Decisión:** ❌ Descartada
+- **Justificación:** la correlación de Pearson es sensible a los valores extremos, y en estas variables unos pocos tweets y cuentas están muy alejados del resto, así que el resultado depende de ellos y no del conjunto. Sobre `log1p` cada tweet pesa de forma más pareja.
+
 ## 3. Ingeniería de features
 
 ## 4. Preprocesamiento de texto
