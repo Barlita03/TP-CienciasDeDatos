@@ -111,6 +111,33 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ## 3. Ingeniería de features
 
+### J-10 · Longitud del tweet en caracteres, sin URLs ni menciones
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #4 / pendiente
+- **Propuesta:** crear la feature `largo_texto`, la cantidad de caracteres del tweet después de quitar las URLs y las menciones, para medir solo lo que escribió la persona.
+- **Cómo se probó:** percentiles 25, 50 y 75 y boxplot de `largo_texto` por clase.
+- **Evidencia:** medianas de 182 (P), 163 (NEU) y 171 (N) caracteres, y percentiles 75 de 245, 242 y 248. El percentil 25 de NEU es 71, frente a 105 en P y 96 en N. 52 tweets quedan con largo 0 porque solo tenían links o menciones.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** P y N tienen una longitud casi igual, así que la feature no ayuda a separarlos, pero NEU tiene más tweets cortos, por lo que puede aportar para distinguir a los neutrales. Quitar URLs y menciones evita medir contenido que no es texto propio (J-11). Su aporte real se evalúa en el modelado.
+
+### J-11 · Longitud en caracteres del texto original
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #4 / pendiente
+- **Propuesta:** medir la longitud como la cantidad de caracteres del texto tal como viene, sin quitar nada.
+- **Cómo se probó:** percentiles 25, 50 y 75 y boxplot por clase, comparados con J-10, y cantidad de tweets que superan el límite de 280 caracteres de Twitter.
+- **Evidencia:** medianas de 192 (P), 184 (NEU) y 193 (N). El percentil 25 de NEU es un 19% más bajo que el de P (95 frente a 118), contra un 32% en J-10. 464 tweets superan los 280 caracteres y el 51% de ellos empieza con una mención; sin URLs ni menciones, solo 3 quedan por encima.
+- **Decisión:** ❌ Descartada
+- **Justificación:** la medida se infla con links y menciones, que no son texto escrito por la persona, y eso achica la diferencia de los neutrales que muestra J-10.
+
+### J-12 · Longitud en palabras, sin URLs ni menciones
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #4 / pendiente
+- **Propuesta:** medir la longitud como la cantidad de palabras del texto sin URLs ni menciones.
+- **Cómo se probó:** percentiles 25, 50 y 75 y boxplot por clase, comparados con J-10.
+- **Evidencia:** medianas de 28 (P), 27 (NEU) y 29 (N) palabras. El percentil 25 de NEU es 12, frente a 15 en P y 16 en N: un 20% más bajo que P, contra un 32% en caracteres (J-10).
+- **Decisión:** ❌ Descartada
+- **Justificación:** muestra el mismo patrón que contar caracteres pero con una diferencia menos marcada, así que no agrega información.
+
 ## 4. Preprocesamiento de texto
 
 ## 5. Modelado
