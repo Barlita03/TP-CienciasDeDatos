@@ -165,6 +165,51 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Decisión:** ❌ Descartada
 - **Justificación:** el patrón casi no cambia, quedan menos tweets con información y la feature pasa a depender de una lista armada a mano, que habría que justificar. La mejora es mínima frente a la decisión arbitraria que agrega.
 
+### J-16 · Cantidad de menciones al inicio del tweet, con tope en 2
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #6 / pendiente
+- **Propuesta:** crear la feature `menciones_inicio`, la cantidad de menciones con las que empieza el tweet (así se ven las respuestas en Twitter), con tope en 2.
+- **Cómo se probó:** proporción de clases según las menciones al inicio (0, 1 y 2 o más) y correlación con `largo_texto` y `cant_hashtags` sobre `log1p`.
+- **Evidencia:** el 44,3% de los tweets empieza con una mención. Los negativos son el 9,8% de los tweets sin menciones al inicio, el 19,2% de los que tienen 1 y el 23,4% de los que tienen 2 o más; los positivos, el 22,7%, el 15,5% y el 10,9%. La correlación es de -0,41 con `largo_texto` y de -0,27 con `cant_hashtags`.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** la proporción de negativos sube con cada mención al inicio, así que la feature puede ayudar a reconocerlos. Contar solo las del inicio evita mezclarlas con las del resto del texto, que se comportan al revés (J-17 y J-20). Contarlas conserva la diferencia entre empezar con 1 o con 2 o más (J-18), y el tope evita que los pocos tweets con muchas menciones pesen demasiado (J-19). Las correlaciones con las otras features son moderadas, así que no repiten su información. El dataset no indica qué tweets son respuestas, por lo que es una aproximación. Su aporte real se evalúa en el modelado.
+
+### J-17 · Cantidad total de menciones
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #6 / pendiente
+- **Propuesta:** contar todas las menciones del tweet, sin distinguir dónde están.
+- **Cómo se probó:** proporción de clases según la cantidad total de menciones (0, 1, 2, 3-4 y 5 o más).
+- **Evidencia:** la proporción de negativos sube de 10,4% sin menciones a 21,2% con 3-4, pero con 5 o más baja a 14,1%; la de positivos baja de 23,4% a 9,6% y después sube a 20,3%.
+- **Decisión:** ❌ Descartada
+- **Justificación:** mezcla las menciones del inicio, que tienden a ser negativas, con las del resto del texto, que tienden a ser neutrales, y los dos efectos se tapan entre sí.
+
+### J-18 · Feature binaria: si el tweet es una respuesta
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #6 / pendiente
+- **Propuesta:** en lugar de contar las menciones del inicio, marcar solo si el tweet empieza con alguna (`es_respuesta`).
+- **Cómo se probó:** proporción de clases en los tweets que empiezan y no empiezan con una mención, comparada con J-16.
+- **Evidencia:** los negativos son el 20,8% de los tweets que empiezan con una mención y el 9,8% de los que no. Pero dentro de los primeros, son el 19,2% con 1 mención al inicio (1100 tweets) y el 23,4% con 2 o más (689 tweets).
+- **Decisión:** ❌ Descartada
+- **Justificación:** es la misma información que `menciones_inicio` con los grupos 1 y "2 o más" juntos. Capta el salto más grande, pero pierde una diferencia que se apoya en grupos grandes, y contar las menciones no es más difícil de calcular ni de explicar.
+
+### J-19 · Cantidad de menciones al inicio sin tope
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #6 / pendiente
+- **Propuesta:** usar la cantidad de menciones al inicio tal cual, sin tope.
+- **Cómo se probó:** resumen de la variable y proporción de clases para cada cantidad de menciones al inicio.
+- **Evidencia:** el percentil 99 es 5 y el máximo es 21. Los negativos suben hasta las 3 menciones (26,6%), pero desde 4 los grupos tienen entre 13 y 49 tweets y los porcentajes varían sin un patrón (20,4%, 23,1% y 14,3%).
+- **Decisión:** ❌ Descartada
+- **Justificación:** más allá de las 2 o 3 menciones no hay un patrón claro, y sin tope un modelo lineal (regresión logística o SVM) le daría a un tweet con 21 menciones un peso mucho mayor que a uno con 1 o 2. Los árboles sí podrían usarla sin problema, así que se puede comparar con J-16 en el modelado.
+
+### J-20 · Cantidad de menciones en el resto del texto como segunda feature
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #6 / pendiente
+- **Propuesta:** sumar a `menciones_inicio` una segunda feature, `cant_menciones_texto`, con la cantidad de menciones que no están al inicio del tweet.
+- **Cómo se probó:** proporción de clases según las menciones en el resto del texto (0, 1 y 2 o más) y correlación con `menciones_inicio` sobre `log1p`.
+- **Evidencia:** solo el 8,7% de los tweets (353) tiene menciones en el resto del texto, y el máximo es 9. A medida que aumentan, sube la proporción de neutrales (65,8%, 71,6% y 79,7%) y baja la de negativos (de 15,4% a 2,3%). La correlación con `menciones_inicio` es de -0,18.
+- **Decisión:** ❌ Descartada
+- **Justificación:** muestra una señal propia, distinta de la de las menciones al inicio, pero afecta a pocos tweets, así que por ahora se prioriza una sola feature más simple. Se puede volver a sumar si en el modelado hace falta.
+
 ## 4. Preprocesamiento de texto
 
 ## 5. Modelado
