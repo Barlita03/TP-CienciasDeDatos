@@ -210,6 +210,33 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Decisión:** ❌ Descartada
 - **Justificación:** muestra una señal propia, distinta de la de las menciones al inicio, pero afecta a pocos tweets, así que por ahora se prioriza una sola feature más simple. Se puede volver a sumar si en el modelado hace falta.
 
+### J-21 · Si el tweet tiene signos de exclamación
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #31 / pendiente
+- **Propuesta:** crear la feature `tiene_exclamacion`, que vale 1 si el tweet tiene al menos un `!`, contado sin las URLs.
+- **Cómo se probó:** proporción de clases en los tweets con y sin `!`, cantidad de tweets con `¡` pero sin `!`, y correlación con `largo_texto`, `cant_hashtags` y `menciones_inicio` sobre `log1p`.
+- **Evidencia:** el 8,7% de los tweets tiene `!`. Entre ellos, el 53,8% es positivo, el 35,9% neutral y el 10,3% negativo, contra 15,4%, 69,5% y 15,1% en los que no tienen. Solo 2 tweets tienen `¡` sin `!`. La correlación con las otras features está entre -0,01 y 0,06.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** es la diferencia entre clases más grande de las features analizadas: los tweets con `!` son positivos más del triple de veces que el resto. No se correlaciona con las otras features, así que aporta información nueva. El `¡` no se cuenta porque casi siempre va con un `!`. Su aporte real se evalúa en el modelado.
+
+### J-22 · Cantidad de signos de exclamación
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #31 / pendiente
+- **Propuesta:** contar los `!` de cada tweet, con tope en 3, en lugar de marcar solo si hay alguno.
+- **Cómo se probó:** resumen de la variable y proporción de clases según la cantidad de `!` (0, 1, 2 y 3 o más).
+- **Evidencia:** el percentil 99 es 2 y el máximo, 9. Los positivos son el 58,1% de los tweets con un `!`, el 44,7% de los que tienen 2 y el 35,9% de los que tienen 3 o más, donde los negativos también son el 35,9%. Los grupos con 2 y con 3 o más tienen 47 y 39 tweets.
+- **Decisión:** ❌ Descartada
+- **Justificación:** la relación sube y baja: un `!` suele acompañar a un tweet entusiasta, pero muchos también aparecen en críticas o quejas. Con grupos tan chicos, contar no agrega información confiable respecto de marcar si hay algún `!`.
+
+### J-23 · Signos de exclamación repetidos como segunda feature
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #31 / pendiente
+- **Propuesta:** sumar a `tiene_exclamacion` una segunda feature que marque si el tweet tiene `!` repetidos (`!!`).
+- **Cómo se probó:** proporción de clases en los tweets con y sin `!!`.
+- **Evidencia:** 52 tweets tienen `!!`. Entre ellos, el 32,7% es negativo, contra el 14,4% del resto.
+- **Decisión:** ❌ Descartada
+- **Justificación:** muestra una señal hacia los negativos, pero afecta a muy pocos tweets, el mismo criterio que en J-20. Se puede volver a sumar si en el modelado hace falta.
+
 ## 4. Preprocesamiento de texto
 
 ## 5. Modelado
