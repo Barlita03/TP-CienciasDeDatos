@@ -21,7 +21,7 @@ Las etapas 1 a 6 salen de los títulos de los Lineamientos de la consigna, y la 
 ## 3. Ingeniería de features
 
 - [ ] Longitud del tweet ([#4](https://github.com/Barlita03/TP-CienciasDeDatos/issues/4))
-- [ ] Cantidad de hashtags ([#5](https://github.com/Barlita03/TP-CienciasDeDatos/issues/5))
+- [x] Cantidad de hashtags ([#5](https://github.com/Barlita03/TP-CienciasDeDatos/issues/5))
 - [ ] Cantidad de usuarios mencionados ([#6](https://github.com/Barlita03/TP-CienciasDeDatos/issues/6))
 - [ ] Justificar por qué cada feature podría ser útil ([#7](https://github.com/Barlita03/TP-CienciasDeDatos/issues/7))
 

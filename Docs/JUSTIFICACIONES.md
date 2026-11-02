@@ -138,6 +138,33 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Decisión:** ❌ Descartada
 - **Justificación:** muestra el mismo patrón que contar caracteres pero con una diferencia menos marcada, así que no agrega información.
 
+### J-13 · Cantidad de hashtags del tweet
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #5 / pendiente
+- **Propuesta:** crear la feature `cant_hashtags`, la cantidad de palabras del tweet que empiezan con `#`.
+- **Cómo se probó:** porcentaje de tweets con al menos un hashtag y media por clase, proporción de clases según la cantidad de hashtags (0, 1, 2 y 3 o más) y correlación con `largo_texto` sobre `log1p`.
+- **Evidencia:** el 15,3% de los tweets tiene hashtags y el máximo es 21. Tiene algún hashtag el 23,5% de los positivos, el 14,8% de los neutrales y el 6,9% de los negativos. Los positivos pasan de ser el 16,9% de los tweets sin hashtags al 37,4% de los que tienen 2. Con 3 o más hashtags, el 71,4% es neutral y solo el 2,5% es negativo (contra 66,6% y 14,7% en el dataset). La correlación con `largo_texto` es de 0,17.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** un tweet con hashtags rara vez es negativo, así que la feature puede ayudar a separar positivos de negativos, algo que la longitud no logra (J-10). Al tener una correlación baja con `largo_texto`, no repite su información. Los valores altos son reales (tweets de difusión con muchos hashtags) y se mantienen. Su aporte real se evalúa en el modelado.
+
+### J-14 · Feature binaria: si el tweet tiene o no hashtags
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #5 / pendiente
+- **Propuesta:** en lugar de contar los hashtags, indicar solo si el tweet tiene alguno.
+- **Cómo se probó:** proporción de clases en los tweets con y sin hashtags, comparada con J-13.
+- **Evidencia:** entre los tweets con hashtags hay un 28,9% de positivos y un 6,7% de negativos, contra 16,9% y 16,1% en los que no tienen. Pero el grupo "con hashtags" mezcla a los tweets con 1 hashtag con los que tienen 3 o más, donde la proporción de neutrales sube al 71,4%.
+- **Decisión:** ❌ Descartada
+- **Justificación:** capta la misma diferencia entre P y N que la cantidad, pero pierde el patrón de los tweets con muchos hashtags. La cantidad ya incluye esta información, porque un modelo puede separar 0 de "1 o más" a partir de ella.
+
+### J-15 · Cantidad de hashtags sin los del tema del dataset
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #5 / pendiente
+- **Propuesta:** no contar los hashtags sobre el tema del dataset (`#ia`, `#ai`, `#inteligenciaartificial`, `#artificialintelligence`, `#chatgpt`, `#openai`), que son los más usados y podrían aparecer por cómo se recolectaron los tweets y no por su sentimiento.
+- **Cómo se probó:** las mismas tablas que en J-13, con la cantidad de hashtags sin los del tema.
+- **Evidencia:** los tweets con hashtags bajan de 616 a 461. Tiene algún hashtag el 18,9% de los positivos, el 10,7% de los neutrales y el 5,1% de los negativos: los positivos los usan 3,7 veces más que los negativos, contra 3,4 veces contando todos.
+- **Decisión:** ❌ Descartada
+- **Justificación:** el patrón casi no cambia, quedan menos tweets con información y la feature pasa a depender de una lista armada a mano, que habría que justificar. La mejora es mínima frente a la decisión arbitraria que agrega.
+
 ## 4. Preprocesamiento de texto
 
 ## 5. Modelado
