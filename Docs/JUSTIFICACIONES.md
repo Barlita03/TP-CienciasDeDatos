@@ -113,7 +113,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-10 · Longitud del tweet en caracteres, sin URLs ni menciones
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #4 / pendiente
+- **Issue / PR:** #4 / #33
 - **Propuesta:** crear la feature `largo_texto`, la cantidad de caracteres del tweet después de quitar las URLs y las menciones, para medir solo lo que escribió la persona.
 - **Cómo se probó:** percentiles 25, 50 y 75 y boxplot de `largo_texto` por clase.
 - **Evidencia:** medianas de 182 (P), 163 (NEU) y 171 (N) caracteres, y percentiles 75 de 245, 242 y 248. El percentil 25 de NEU es 71, frente a 105 en P y 96 en N. 52 tweets quedan con largo 0 porque solo tenían links o menciones.
@@ -122,7 +122,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-11 · Longitud en caracteres del texto original
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #4 / pendiente
+- **Issue / PR:** #4 / #33
 - **Propuesta:** medir la longitud como la cantidad de caracteres del texto tal como viene, sin quitar nada.
 - **Cómo se probó:** percentiles 25, 50 y 75 y boxplot por clase, comparados con J-10, y cantidad de tweets que superan el límite de 280 caracteres de Twitter.
 - **Evidencia:** medianas de 192 (P), 184 (NEU) y 193 (N). El percentil 25 de NEU es un 19% más bajo que el de P (95 frente a 118), contra un 32% en J-10. 464 tweets superan los 280 caracteres y el 51% de ellos empieza con una mención; sin URLs ni menciones, solo 3 quedan por encima.
@@ -131,7 +131,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-12 · Longitud en palabras, sin URLs ni menciones
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #4 / pendiente
+- **Issue / PR:** #4 / #33
 - **Propuesta:** medir la longitud como la cantidad de palabras del texto sin URLs ni menciones.
 - **Cómo se probó:** percentiles 25, 50 y 75 y boxplot por clase, comparados con J-10.
 - **Evidencia:** medianas de 28 (P), 27 (NEU) y 29 (N) palabras. El percentil 25 de NEU es 12, frente a 15 en P y 16 en N: un 20% más bajo que P, contra un 32% en caracteres (J-10).
@@ -140,7 +140,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-13 · Cantidad de hashtags del tweet
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #5 / pendiente
+- **Issue / PR:** #5 / #33
 - **Propuesta:** crear la feature `cant_hashtags`, la cantidad de palabras del tweet que empiezan con `#`.
 - **Cómo se probó:** porcentaje de tweets con al menos un hashtag y media por clase, proporción de clases según la cantidad de hashtags (0, 1, 2 y 3 o más) y correlación con `largo_texto` sobre `log1p`.
 - **Evidencia:** el 15,3% de los tweets tiene hashtags y el máximo es 21. Tiene algún hashtag el 23,5% de los positivos, el 14,8% de los neutrales y el 6,9% de los negativos. Los positivos pasan de ser el 16,9% de los tweets sin hashtags al 37,4% de los que tienen 2. Con 3 o más hashtags, el 71,4% es neutral y solo el 2,5% es negativo (contra 66,6% y 14,7% en el dataset). La correlación con `largo_texto` es de 0,17.
@@ -149,7 +149,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-14 · Feature binaria: si el tweet tiene o no hashtags
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #5 / pendiente
+- **Issue / PR:** #5 / #33
 - **Propuesta:** en lugar de contar los hashtags, indicar solo si el tweet tiene alguno.
 - **Cómo se probó:** proporción de clases en los tweets con y sin hashtags, comparada con J-13.
 - **Evidencia:** entre los tweets con hashtags hay un 28,9% de positivos y un 6,7% de negativos, contra 16,9% y 16,1% en los que no tienen. Pero el grupo "con hashtags" mezcla a los tweets con 1 hashtag con los que tienen 3 o más, donde la proporción de neutrales sube al 71,4%.
@@ -158,7 +158,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-15 · Cantidad de hashtags sin los del tema del dataset
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #5 / pendiente
+- **Issue / PR:** #5 / #33
 - **Propuesta:** no contar los hashtags sobre el tema del dataset (`#ia`, `#ai`, `#inteligenciaartificial`, `#artificialintelligence`, `#chatgpt`, `#openai`), que son los más usados y podrían aparecer por cómo se recolectaron los tweets y no por su sentimiento.
 - **Cómo se probó:** las mismas tablas que en J-13, con la cantidad de hashtags sin los del tema.
 - **Evidencia:** los tweets con hashtags bajan de 616 a 461. Tiene algún hashtag el 18,9% de los positivos, el 10,7% de los neutrales y el 5,1% de los negativos: los positivos los usan 3,7 veces más que los negativos, contra 3,4 veces contando todos.
@@ -167,7 +167,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-16 · Cantidad de menciones al inicio del tweet, con tope en 2
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #6 / pendiente
+- **Issue / PR:** #6 / #33
 - **Propuesta:** crear la feature `menciones_inicio`, la cantidad de menciones con las que empieza el tweet (así se ven las respuestas en Twitter), con tope en 2.
 - **Cómo se probó:** proporción de clases según las menciones al inicio (0, 1 y 2 o más) y correlación con `largo_texto` y `cant_hashtags` sobre `log1p`.
 - **Evidencia:** el 44,3% de los tweets empieza con una mención. Los negativos son el 9,8% de los tweets sin menciones al inicio, el 19,2% de los que tienen 1 y el 23,4% de los que tienen 2 o más; los positivos, el 22,7%, el 15,5% y el 10,9%. La correlación es de -0,41 con `largo_texto` y de -0,27 con `cant_hashtags`.
@@ -176,7 +176,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-17 · Cantidad total de menciones
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #6 / pendiente
+- **Issue / PR:** #6 / #33
 - **Propuesta:** contar todas las menciones del tweet, sin distinguir dónde están.
 - **Cómo se probó:** proporción de clases según la cantidad total de menciones (0, 1, 2, 3-4 y 5 o más).
 - **Evidencia:** la proporción de negativos sube de 10,4% sin menciones a 21,2% con 3-4, pero con 5 o más baja a 14,1%; la de positivos baja de 23,4% a 9,6% y después sube a 20,3%.
@@ -185,7 +185,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-18 · Feature binaria: si el tweet es una respuesta
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #6 / pendiente
+- **Issue / PR:** #6 / #33
 - **Propuesta:** en lugar de contar las menciones del inicio, marcar solo si el tweet empieza con alguna (`es_respuesta`).
 - **Cómo se probó:** proporción de clases en los tweets que empiezan y no empiezan con una mención, comparada con J-16.
 - **Evidencia:** los negativos son el 20,8% de los tweets que empiezan con una mención y el 9,8% de los que no. Pero dentro de los primeros, son el 19,2% con 1 mención al inicio (1100 tweets) y el 23,4% con 2 o más (689 tweets).
@@ -194,7 +194,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-19 · Cantidad de menciones al inicio sin tope
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #6 / pendiente
+- **Issue / PR:** #6 / #33
 - **Propuesta:** usar la cantidad de menciones al inicio tal cual, sin tope.
 - **Cómo se probó:** resumen de la variable y proporción de clases para cada cantidad de menciones al inicio.
 - **Evidencia:** el percentil 99 es 5 y el máximo es 21. Los negativos suben hasta las 3 menciones (26,6%), pero desde 4 los grupos tienen entre 13 y 49 tweets y los porcentajes varían sin un patrón (20,4%, 23,1% y 14,3%).
@@ -203,7 +203,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-20 · Cantidad de menciones en el resto del texto como segunda feature
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #6 / pendiente
+- **Issue / PR:** #6 / #33
 - **Propuesta:** sumar a `menciones_inicio` una segunda feature, `cant_menciones_texto`, con la cantidad de menciones que no están al inicio del tweet.
 - **Cómo se probó:** proporción de clases según las menciones en el resto del texto (0, 1 y 2 o más) y correlación con `menciones_inicio` sobre `log1p`.
 - **Evidencia:** solo el 8,7% de los tweets (353) tiene menciones en el resto del texto, y el máximo es 9. A medida que aumentan, sube la proporción de neutrales (65,8%, 71,6% y 79,7%) y baja la de negativos (de 15,4% a 2,3%). La correlación con `menciones_inicio` es de -0,18.
@@ -212,7 +212,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-21 · Si el tweet tiene signos de exclamación
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #31 / pendiente
+- **Issue / PR:** #31 / #33
 - **Propuesta:** crear la feature `tiene_exclamacion`, que vale 1 si el tweet tiene al menos un `!`, contado sin las URLs.
 - **Cómo se probó:** proporción de clases en los tweets con y sin `!`, cantidad de tweets con `¡` pero sin `!`, y correlación con `largo_texto`, `cant_hashtags` y `menciones_inicio` sobre `log1p`.
 - **Evidencia:** el 8,7% de los tweets tiene `!`. Entre ellos, el 53,8% es positivo, el 35,9% neutral y el 10,3% negativo, contra 15,4%, 69,5% y 15,1% en los que no tienen. Solo 2 tweets tienen `¡` sin `!`. La correlación con las otras features está entre -0,01 y 0,06.
@@ -221,7 +221,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-22 · Cantidad de signos de exclamación
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #31 / pendiente
+- **Issue / PR:** #31 / #33
 - **Propuesta:** contar los `!` de cada tweet, con tope en 3, en lugar de marcar solo si hay alguno.
 - **Cómo se probó:** resumen de la variable y proporción de clases según la cantidad de `!` (0, 1, 2 y 3 o más).
 - **Evidencia:** el percentil 99 es 2 y el máximo, 9. Los positivos son el 58,1% de los tweets con un `!`, el 44,7% de los que tienen 2 y el 35,9% de los que tienen 3 o más, donde los negativos también son el 35,9%. Los grupos con 2 y con 3 o más tienen 47 y 39 tweets.
@@ -230,7 +230,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-23 · Signos de exclamación repetidos como segunda feature
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #31 / pendiente
+- **Issue / PR:** #31 / #33
 - **Propuesta:** sumar a `tiene_exclamacion` una segunda feature que marque si el tweet tiene `!` repetidos (`!!`).
 - **Cómo se probó:** proporción de clases en los tweets con y sin `!!`.
 - **Evidencia:** 52 tweets tienen `!!`. Entre ellos, el 32,7% es negativo, contra el 14,4% del resto.
@@ -239,7 +239,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-24 · Cantidad de signos de pregunta, con tope en 2
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #32 / pendiente
+- **Issue / PR:** #32 / #33
 - **Propuesta:** crear la feature `cant_preguntas`, la cantidad de `?` del tweet contados sin las URLs, con tope en 2.
 - **Cómo se probó:** proporción de clases según la cantidad de `?` (0, 1 y 2 o más), cantidad de tweets con `¿` pero sin `?`, y correlación con `largo_texto`, `cant_hashtags`, `menciones_inicio` y `tiene_exclamacion` sobre `log1p`.
 - **Evidencia:** el 12,4% de los tweets tiene `?`. Los positivos son el 20,1% de los tweets sin preguntas, el 11,2% de los que tienen una y el 1,8% de los que tienen 2 o más (109 tweets). Los neutrales son el 64,9%, el 78,6% y el 78,9%. Ningún tweet tiene `¿` sin `?`. La correlación con las otras features está entre 0,00 y 0,05.
@@ -248,7 +248,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-25 · Feature binaria: si el tweet tiene signos de pregunta
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #32 / pendiente
+- **Issue / PR:** #32 / #33
 - **Propuesta:** marcar solo si el tweet tiene algún `?`, en lugar de contarlos.
 - **Cómo se probó:** proporción de clases en los tweets con y sin `?`, comparada con J-24.
 - **Evidencia:** los positivos son el 9,2% de los tweets con `?` y el 20,1% de los que no tienen. Dentro de los primeros, son el 11,2% con una pregunta y el 1,8% con 2 o más.
@@ -257,7 +257,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-26 · Cantidad de signos de pregunta sin tope
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #32 / pendiente
+- **Issue / PR:** #32 / #33
 - **Propuesta:** usar la cantidad de `?` tal cual, sin tope.
 - **Cómo se probó:** resumen de la variable y proporción de clases para cada cantidad de `?`.
 - **Evidencia:** el percentil 99 es 2 y el máximo, 7. Los tweets con 3 `?` son 20 y los que tienen 4 o más, 17.
@@ -266,7 +266,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-27 · Signos de pregunta repetidos como segunda feature
 - **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** #32 / pendiente
+- **Issue / PR:** #32 / #33
 - **Propuesta:** sumar a `cant_preguntas` una segunda feature que marque si el tweet tiene `?` repetidos (`??`).
 - **Cómo se probó:** proporción de clases en los tweets con y sin `??`.
 - **Evidencia:** 22 tweets tienen `??`. Ninguno es positivo y el 27,3% es negativo.

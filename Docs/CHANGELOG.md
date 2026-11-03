@@ -18,6 +18,9 @@ Línea de tiempo de los cambios del proyecto.
 
 ---
 
+## 2026-11-02
+- Agrega las features de la etapa 3: longitud, hashtags, menciones, exclamaciones y preguntas (#33)
+
 ## 2026-10-18
 - Agrega el análisis de las variables disponibles: distribución, interacción por clase y outliers (#30)
 
