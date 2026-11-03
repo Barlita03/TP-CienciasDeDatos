@@ -237,6 +237,42 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Decisión:** ❌ Descartada
 - **Justificación:** muestra una señal hacia los negativos, pero afecta a muy pocos tweets, el mismo criterio que en J-20. Se puede volver a sumar si en el modelado hace falta.
 
+### J-24 · Cantidad de signos de pregunta, con tope en 2
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #32 / pendiente
+- **Propuesta:** crear la feature `cant_preguntas`, la cantidad de `?` del tweet contados sin las URLs, con tope en 2.
+- **Cómo se probó:** proporción de clases según la cantidad de `?` (0, 1 y 2 o más), cantidad de tweets con `¿` pero sin `?`, y correlación con `largo_texto`, `cant_hashtags`, `menciones_inicio` y `tiene_exclamacion` sobre `log1p`.
+- **Evidencia:** el 12,4% de los tweets tiene `?`. Los positivos son el 20,1% de los tweets sin preguntas, el 11,2% de los que tienen una y el 1,8% de los que tienen 2 o más (109 tweets). Los neutrales son el 64,9%, el 78,6% y el 78,9%. Ningún tweet tiene `¿` sin `?`. La correlación con las otras features está entre 0,00 y 0,05.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** la proporción de positivos baja con cada `?`, así que la relación va en una sola dirección y se usa la cantidad, el mismo criterio que con las menciones al inicio (J-16). El tope evita que los pocos tweets con muchas preguntas pesen demasiado (J-26). No se correlaciona con las otras features, así que aporta información nueva. Su aporte real se evalúa en el modelado.
+
+### J-25 · Feature binaria: si el tweet tiene signos de pregunta
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #32 / pendiente
+- **Propuesta:** marcar solo si el tweet tiene algún `?`, en lugar de contarlos.
+- **Cómo se probó:** proporción de clases en los tweets con y sin `?`, comparada con J-24.
+- **Evidencia:** los positivos son el 9,2% de los tweets con `?` y el 20,1% de los que no tienen. Dentro de los primeros, son el 11,2% con una pregunta y el 1,8% con 2 o más.
+- **Decisión:** ❌ Descartada
+- **Justificación:** junta a los tweets con una pregunta y con varias, y pierde que con 2 o más casi no hay positivos.
+
+### J-26 · Cantidad de signos de pregunta sin tope
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #32 / pendiente
+- **Propuesta:** usar la cantidad de `?` tal cual, sin tope.
+- **Cómo se probó:** resumen de la variable y proporción de clases para cada cantidad de `?`.
+- **Evidencia:** el percentil 99 es 2 y el máximo, 7. Los tweets con 3 `?` son 20 y los que tienen 4 o más, 17.
+- **Decisión:** ❌ Descartada
+- **Justificación:** desde 3 preguntas los grupos son demasiado chicos para sacar conclusiones, y sin tope los valores altos pesarían más que el resto en un modelo lineal.
+
+### J-27 · Signos de pregunta repetidos como segunda feature
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #32 / pendiente
+- **Propuesta:** sumar a `cant_preguntas` una segunda feature que marque si el tweet tiene `?` repetidos (`??`).
+- **Cómo se probó:** proporción de clases en los tweets con y sin `??`.
+- **Evidencia:** 22 tweets tienen `??`. Ninguno es positivo y el 27,3% es negativo.
+- **Decisión:** ❌ Descartada
+- **Justificación:** afecta a muy pocos tweets, el mismo criterio que en J-23.
+
 ## 4. Preprocesamiento de texto
 
 ## 5. Modelado
