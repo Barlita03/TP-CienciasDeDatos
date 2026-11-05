@@ -300,6 +300,24 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Decisión:** ❌ Descartada
 - **Justificación:** agrega un criterio más complejo y puede borrar tweets que no son copias, a cambio de quitar solo 32 filas más.
 
+### J-31 · Cantidad de emojis, con tope en 2
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #35 / #33
+- **Propuesta:** crear la feature `cant_emojis`, la cantidad de emojis del tweet contados sin las URLs, con tope en 2.
+- **Cómo se probó:** porcentaje de tweets con al menos un emoji y media por clase, proporción de clases según la cantidad de emojis (0, 1 y 2 o más) y correlación con el resto de las features sobre `log1p`. Se usó la librería `emoji` para no separar emojis compuestos.
+- **Evidencia:** el 23,5% de los tweets tiene emojis (937). El máximo es 17. Tienen algún emoji el 38,6% de los positivos, el 21,4% de los neutrales y el 15,0% de los negativos. La proporción de positivos sube de 14,3% (0 emojis) a 26,2% (1 emoji) y a 33,2% (2 o más). La de negativos baja de 16,5% a 9,9% y a 8,9%. La correlación más alta es de 0,20 (con `cant_hashtags`).
+- **Decisión:** ✅ Aprobada
+- **Justificación:** la proporción de positivos sube con cada emoji, y la de negativos baja. Como la relación va en una sola dirección, se usa la cantidad y no solo si hay alguno (J-32). El tope evita que los pocos tweets con muchos emojis pesen demasiado (J-32). Tiene correlaciones bajas, así que aporta información nueva.
+
+### J-32 · Alternativas descartadas para los emojis (sin tope, presencia y filtro temático)
+- **Etapa:** 3. Ingeniería de features
+- **Issue / PR:** #35 / #33
+- **Propuesta:** evaluar tres formas alternativas de medir los emojis: usar la cantidad sin tope, indicar solo si el tweet tiene o no emojis, y contar la cantidad omitiendo el emoji del tema (🤖).
+- **Cómo se probó:** proporción de clases para los distintos agrupamientos de cada alternativa, comparadas con la feature aprobada (J-31).
+- **Evidencia:** con "tiene o no", la proporción de positivos sube a 29,1% cuando hay emojis, juntando a los grupos de 1 y de 2 o más. "Sin tope" llega hasta 17 emojis, pero a partir de 3, las proporciones varían sin un patrón claro. Al descartar el emoji 🤖, los tweets con emojis bajan de 937 a 926, y la proporción de positivos sube de 14,3% a 27,0% (1 emoji) y a 32,8% (2 o más).
+- **Decisión:** ❌ Descartada
+- **Justificación:** "tiene o no" pierde que la proporción de positivos sigue subiendo. "Sin tope" deja que valores extremos pesen demasiado en modelos lineales sin agregar un patrón claro. "Sin el emoji del tema" tiene una mejora casi nula frente a J-31, sumando una regla basada en una lista manual de emojis descartables.
+
 ## 4. Preprocesamiento de texto
 
 ## 5. Modelado
