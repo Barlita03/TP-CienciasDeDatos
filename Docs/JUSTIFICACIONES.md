@@ -158,6 +158,51 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Decisión:** ❌ Descartada
 - **Justificación:** como casi todos los tweets con link tienen uno solo, el conteo agrega poco frente a la presencia.
 
+### J-36 · Sacar el `#`, separar y agregar la feature `n_hashtags` (camino E)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #9 / #PR
+- **Propuesta:** en `texto_procesado`, reemplazar cada hashtag por sus palabras. Se saca el `#`, se separan las palabras unidas con mayúsculas antes de pasar a minúsculas y se borran los `#` sueltos y la cantidad de hashtags se guarda en una columna `n_hashtags`.
+- **Cómo se probó:** análisis del porcentaje de tweets con hashtag y de la cantidad promedio por clase, de los hashtags más usados, de su posición en el texto y de las variantes de "inteligencia artificial" por clase. Después, comparación de los cinco caminos (J-36 a J-40) según si conservan la palabra y la presencia y cantidad. El impacto en el desempeño no se midió todavía: se va a validar en el modelado, con validación cruzada solo sobre train y F1 macro.
+- **Evidencia:** tiene hashtag el 23,51% de los positivos, el 14,76% de los neutrales y el 6,93% de los negativos. Entre los tweets con hashtag, el promedio es 1,93, 2,28 y 1,51, y 292 de los 616 tienen dos o más. El 62,99% de los tweets con hashtag tiene alguno dentro de la frase. Se considera que un hashtag está "al final" cuando después solo hay otros hashtags, URLs, espacios o signos de puntuación. El 22,88% de los hashtags junta varias palabras con mayúsculas. "Inteligencia artificial" aparece en 246 hashtags escrita de seis formas, y en todas predomina la clase neutral.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** conserva la palabra, que muchas veces forma parte de la oración, y guarda la presencia y la cantidad, que cambian entre clases. Separar hace que el hashtag termine en las mismas palabras que el texto. Las variantes de "inteligencia artificial" (`ai`, `inteligencia artificial`, `artificial intelligence`, con o sin espacio) no se unifican en `ia`, por dos motivos: la unificación se haría solo en los hashtags y no en el cuerpo del tweet, lo que contradice el argumento de relacionar el hashtag con las palabras del texto, y el concepto es el tema de todo el dataset, por lo que discrimina poco entre clases. Se prefiere `n_hashtags` a una columna binaria `tiene_hashtag` porque conserva la presencia (`n_hashtags > 0`) y además la cantidad.
+
+### J-37 · Mantener los hashtags tal cual (camino A)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #9 / #PR
+- **Propuesta:** no tratar los hashtags y dejarlos en el texto.
+- **Cómo se probó:** mismo análisis que J-36 y revisión de las palabras que TF-IDF obtiene de un tweet con hashtags. Queda por validar en el modelado, con validación cruzada solo sobre train y F1 macro.
+- **Evidencia:** TF-IDF convierte `#IA` en `ia` y `#Tecnología` en `tecnología`.
+- **Decisión:** ❌ Descartada
+- **Justificación:** como TF-IDF no toma el `#` como parte de la palabra, para el modelo este camino es igual a C (J-39). Se descarta por lo mismo: no separa los hashtags compuestos y pierde la presencia y la cantidad de hashtags.
+
+### J-38 · Eliminar los hashtags (camino B)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #9 / #PR
+- **Propuesta:** borrar los hashtags del texto sin dejar rastro.
+- **Cómo se probó:** mismo análisis que J-36. Queda por validar en el modelado, con validación cruzada solo sobre train y F1 macro.
+- **Evidencia:** el 62,99% de los tweets con hashtag tiene alguno dentro de la frase, y la proporción de tweets con hashtag varía casi 17 puntos entre clases.
+- **Decisión:** ❌ Descartada
+- **Justificación:** deja oraciones incompletas y pierde la presencia del hashtag, que se relaciona con la clase.
+
+### J-39 · Sacar solo el `#` (camino C)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #9 / #PR
+- **Propuesta:** borrar el `#` y dejar la palabra tal cual, sin columna extra.
+- **Cómo se probó:** mismo análisis que J-36. Queda por validar en el modelado, con validación cruzada solo sobre train y F1 macro.
+- **Evidencia:** TF-IDF obtiene las mismas palabras que en A: `#IA` y `IA` terminan como `ia`.
+- **Decisión:** ❌ Descartada, equivalente a A con TF-IDF
+- **Justificación:** sacar el `#` a mano solo cambia el texto guardado, no las palabras que ve el modelo, así que tiene los mismos problemas que A (J-37): no separa los hashtags compuestos y pierde la presencia y la cantidad de hashtags, que cambian entre clases.
+
+### J-40 · Reemplazar cada hashtag por un token (camino D)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #9 / #PR
+- **Propuesta:** reemplazar cada hashtag por el token `HASHTAGTOKEN`, como se hizo con las URLs.
+- **Cómo se probó:** mismo análisis que J-36. Queda por validar en el modelado, con validación cruzada solo sobre train y F1 macro.
+- **Evidencia:** el 62,99% de los tweets con hashtag tiene alguno dentro de la frase.
+- **Decisión:** ❌ Descartada
+- **Justificación:** a diferencia del link de una URL, la palabra del hashtag aporta contenido, y el token la pierde. Se podría dejar la palabra junto al token, pero preferimos guardar la señal en una columna, porque queda separada del texto y es más fácil de interpretar.
+
 ## 5. Modelado
 
 ## 6. Evaluación
