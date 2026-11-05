@@ -113,6 +113,51 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ## 4. Preprocesamiento de texto
 
+### J-28 · Reemplazar cada URL por un token (camino C)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #8 / #PR
+- **Propuesta:** reemplazar cada URL del texto por el token `URLTOKEN`, en una columna nueva `texto_procesado`, para descartar el contenido del link y dejar explícita su presencia.
+- **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet, y comparación de los cinco caminos (J-28 a J-32) según si conservan la presencia del link y si descartan el código aleatorio.
+- **Evidencia:** tiene URL el 35,92% de los neutrales, el 29,33% de los positivos y el 19,93% de los negativos, con al menos 592 tweets por clase. De las 1491 URLs, 1490 son de `t.co`, con un código aleatorio.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** lo que puede aportar es la presencia del link, no su contenido. C conserva la presencia y descarta los códigos aleatorios de `t.co`, igual que D, pero se resuelve dentro del texto sin agregar columnas.
+
+### J-29 · Mantener las URLs tal cual (camino A)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #8 / #PR
+- **Propuesta:** no tratar las URLs y dejarlas en el texto.
+- **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet, y revisión de las palabras que TF-IDF obtiene de una URL.
+- **Evidencia:** TF-IDF parte `https://t.co/Hv4UBFRjXb` en `https`, `co` y `hv4ubfrjxb`.
+- **Decisión:** ❌ Descartada
+- **Justificación:** `https` y `co` ya marcan que el tweet tiene link, pero además deja en el texto los códigos aleatorios de `t.co`, que no aportan información.
+
+### J-30 · Eliminar las URLs (camino B)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #8 / #PR
+- **Propuesta:** borrar las URLs del texto sin dejar rastro.
+- **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet.
+- **Evidencia:** la proporción de tweets con URL cambia entre clases (35,92%, 29,33% y 19,93%) y la diferencia es de 16 puntos.
+- **Decisión:** ❌ Descartada
+- **Justificación:** pierde la información de que el tweet tenía link, que se relaciona con la clase.
+
+### J-31 · Eliminar las URLs y agregar la feature `tiene_url` (camino D)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #8 / #PR
+- **Propuesta:** borrar las URLs del texto y guardar su presencia en una columna binaria `tiene_url`.
+- **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet.
+- **Evidencia:** la misma que J-28.
+- **Decisión:** ❌ Descartada, como alternativa equivalente
+- **Justificación:** guarda la misma información que C pero en una columna aparte. Queda como alternativa si en el modelado se combinan el texto con features numéricas.
+
+### J-32 · Eliminar las URLs y agregar la feature `cant_urls` (camino E)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #8 / #PR
+- **Propuesta:** borrar las URLs del texto y guardar la cantidad de URLs en una columna `cant_urls`.
+- **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet.
+- **Evidencia:** 1146 tweets tienen una URL y solo 160 tienen dos o más.
+- **Decisión:** ❌ Descartada
+- **Justificación:** como casi todos los tweets con link tienen uno solo, el conteo agrega poco frente a la presencia.
+
 ## 5. Modelado
 
 ## 6. Evaluación

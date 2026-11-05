@@ -33,6 +33,7 @@ Para cada elemento: decidir si se elimina, se transforma, se construye una featu
 - [ ] Hashtags ([#9](https://github.com/Barlita03/TP-CienciasDeDatos/issues/9))
 - [ ] Menciones a otros usuarios (@usuario) ([#10](https://github.com/Barlita03/TP-CienciasDeDatos/issues/10))
 - [ ] Emojis ([#11](https://github.com/Barlita03/TP-CienciasDeDatos/issues/11))
+- [ ] Tweets duplicados: decidir si se conservan o se eliminan (al sacar las URLs pasan de 57 a 77) ([#34](https://github.com/Barlita03/TP-CienciasDeDatos/issues/34))
 
 ## 5. Modelado
 

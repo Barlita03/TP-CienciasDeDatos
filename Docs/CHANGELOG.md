@@ -18,6 +18,9 @@ Línea de tiempo de los cambios del proyecto.
 
 ---
 
+## AAAA-MM-DD
+- Define el tratamiento de URLs en el preprocesamiento de texto (#PR)
+
 ## 2026-10-18
 - Agrega el análisis de las variables disponibles: distribución, interacción por clase y outliers (#30)
 
