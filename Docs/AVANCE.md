@@ -20,18 +20,21 @@ Las etapas 1 a 6 salen de los títulos de los Lineamientos de la consigna, y la 
 
 ## 3. Ingeniería de features
 
-- [ ] Longitud del tweet ([#4](https://github.com/Barlita03/TP-CienciasDeDatos/issues/4))
-- [ ] Cantidad de hashtags ([#5](https://github.com/Barlita03/TP-CienciasDeDatos/issues/5))
-- [ ] Cantidad de usuarios mencionados ([#6](https://github.com/Barlita03/TP-CienciasDeDatos/issues/6))
-- [ ] Justificar por qué cada feature podría ser útil ([#7](https://github.com/Barlita03/TP-CienciasDeDatos/issues/7))
+- [x] Longitud del tweet ([#4](https://github.com/Barlita03/TP-CienciasDeDatos/issues/4))
+- [x] Cantidad de hashtags ([#5](https://github.com/Barlita03/TP-CienciasDeDatos/issues/5))
+- [x] Cantidad de usuarios mencionados ([#6](https://github.com/Barlita03/TP-CienciasDeDatos/issues/6))
+- [x] Cantidad de signos de exclamación ([#31](https://github.com/Barlita03/TP-CienciasDeDatos/issues/31))
+- [x] Cantidad de signos de pregunta ([#32](https://github.com/Barlita03/TP-CienciasDeDatos/issues/32))
+- [x] Cantidad de emojis ([#35](https://github.com/Barlita03/TP-CienciasDeDatos/issues/35))
+- [x] Justificar por qué cada feature podría ser útil ([#7](https://github.com/Barlita03/TP-CienciasDeDatos/issues/7))
 
 ## 4. Preprocesamiento de texto
 
 Para cada elemento: decidir si se elimina, se transforma, se construye una feature o se mantiene tal cual.
 
-- [ ] URLs ([#8](https://github.com/Barlita03/TP-CienciasDeDatos/issues/8))
-- [ ] Hashtags ([#9](https://github.com/Barlita03/TP-CienciasDeDatos/issues/9))
-- [ ] Menciones a otros usuarios (@usuario) ([#10](https://github.com/Barlita03/TP-CienciasDeDatos/issues/10))
+- [x] URLs ([#8](https://github.com/Barlita03/TP-CienciasDeDatos/issues/8))
+- [x] Hashtags ([#9](https://github.com/Barlita03/TP-CienciasDeDatos/issues/9))
+- [x] Menciones a otros usuarios (@usuario) ([#10](https://github.com/Barlita03/TP-CienciasDeDatos/issues/10))
 - [ ] Emojis ([#11](https://github.com/Barlita03/TP-CienciasDeDatos/issues/11))
 
 ## 5. Modelado
