@@ -35,7 +35,7 @@ Para cada elemento: decidir si se elimina, se transforma, se construye una featu
 - [x] URLs ([#8](https://github.com/Barlita03/TP-CienciasDeDatos/issues/8))
 - [x] Hashtags ([#9](https://github.com/Barlita03/TP-CienciasDeDatos/issues/9))
 - [x] Menciones a otros usuarios (@usuario) ([#10](https://github.com/Barlita03/TP-CienciasDeDatos/issues/10))
-- [ ] Emojis ([#11](https://github.com/Barlita03/TP-CienciasDeDatos/issues/11))
+- [x] Emojis ([#11](https://github.com/Barlita03/TP-CienciasDeDatos/issues/11))
 
 ## 5. Modelado
 

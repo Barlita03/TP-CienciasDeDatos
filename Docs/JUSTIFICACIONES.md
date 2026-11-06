@@ -60,7 +60,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Cómo se probó:** dos `train_test_split` con `stratify` y `random_state=42`: primero el 20% para test y, del resto, el 12,5% para validación (el 10% del total). Tamaño y proporción de clases de cada set.
 - **Evidencia:** quedan 2786 tweets en train, 398 en validación y 797 en test. La proporción de clases es la misma en los tres: P 17,8%, NEU 67,3%-67,4% y N 14,8%-14,9%. En validación hay 59 negativos.
 - **Decisión:** ✅ Aprobada
-- **Justificación:** si el análisis mira validación o test, las decisiones quedan influidas por esos datos y la evaluación deja de mostrar cómo le iría al modelo con tweets nuevos. Validación se usa para comparar modelos y ajustar hiperparámetros, y test solo para la evaluación final. Estratificar asegura la misma proporción de clases en los tres sets, algo importante por el desbalance (J-34). La evidencia de J-01 a J-32 y de J-35 a J-49 se calcula sobre train.
+- **Justificación:** si el análisis mira validación o test, las decisiones quedan influidas por esos datos y la evaluación deja de mostrar cómo le iría al modelo con tweets nuevos. Validación se usa para comparar modelos y ajustar hiperparámetros, y test solo para la evaluación final. Estratificar asegura la misma proporción de clases en los tres sets, algo importante por el desbalance (J-34). La evidencia de J-01 a J-32 y de J-35 a J-54 se calcula sobre train.
 
 ### J-34 · Dividir sin estratificar
 - **Etapa:** 1. Exploración del dataset
@@ -437,7 +437,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 - **Cómo se probó:** análisis del porcentaje de tweets con mención por clase y posición, de los usuarios más mencionados, del tamaño del vocabulario y de los tweets vacíos, y comparación de los cinco caminos (J-45 a J-49). Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
 - **Evidencia:** el 52,66% de los tweets tiene alguna mención. Tiene mención al inicio el 62,41% de los negativos, el 44,30% de los neutrales y el 35,56% de los positivos. Hay 1244 usuarios distintos y el 57,40% aparece una sola vez. El vocabulario pasa de 13226 palabras con menciones a 11999 con el token, una más que al eliminarlas, y ningún tweet queda vacío.
 - **Decisión:** ✅ Aprobada
-- **Justificación:** lo que puede aportar es la presencia de la mención, no el nombre del usuario. Marca también las menciones del resto del texto, que `menciones_inicio` no cuenta, casi sin costo en el vocabulario. Sigue la misma lógica que `URLTOKEN` y es lo que hacen modelos de lenguaje para tweets como [BERTweet](https://arxiv.org/abs/2005.10200) y [Twitter-roBERTa](https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment), aunque esos modelos no usan TF-IDF. Repite en parte lo que dice `menciones_inicio` y pierde el nombre de la cuenta, como `OpenAI`.
+- **Justificación:** lo que puede aportar es la presencia de la mención, no el nombre del usuario. Marca también las menciones del resto del texto, que `menciones_inicio` no cuenta, casi sin costo en el vocabulario. Sigue la misma lógica que `URLTOKEN`. Repite en parte lo que dice `menciones_inicio` y pierde el nombre de la cuenta, como `OpenAI`.
 
 ### J-46 · Mantener las menciones tal cual (camino A)
 - **Etapa:** 4. Preprocesamiento de texto
@@ -474,6 +474,51 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 - **Evidencia:** el vocabulario queda en 12309 palabras, 311 más que al eliminarlas todas, y 7 tweets quedan vacíos.
 - **Decisión:** ❌ Descartada
 - **Justificación:** conserva nombres que forman parte de la frase con poco costo, pero necesita dos reglas según la posición y mantiene nombres de usuario poco repetidos. Queda como alternativa para comparar en el modelado.
+
+### J-50 · Pasar cada emoji a palabras (camino D)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #11 / #36
+- **Propuesta:** reemplazar cada emoji por su nombre en español en `texto_procesado`, con las palabras separadas.
+- **Cómo se probó:** análisis del porcentaje de tweets con emoji por clase, de los emojis más usados y su clase, del tamaño del vocabulario y de los tweets sin palabras propias, y comparación de los cinco caminos (J-50 a J-54). Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** el 24,52% de los tweets tiene emojis. 👏 aparece 23 de 28 veces en positivos, 🚀 20 de 27, 🤔 26 de 28 en neutrales y 🤡 13 de 17 en negativos. Hay 354 emojis distintos y el 53,11% aparece una sola vez. El vocabulario pasa de 13226 a 13444 palabras.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** conserva qué emoji se usó, que `cant_emojis` no distingue y se relaciona con la clase. Los emojis parecidos comparten palabras como `cara` o `corazón`, lo que ayuda con los que aparecen poco. A cambio, algunas palabras pueden confundir (😂 pasa a `cara llorando de risa`) y algunos símbolos suman ruido (`5⃣` pasa a `tecla 5`).
+
+### J-51 · Mantener los emojis tal cual (camino A)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #11 / #36
+- **Propuesta:** no tratar los emojis y dejarlos en el texto.
+- **Cómo se probó:** mismo análisis que J-50 y revisión de las palabras que TF-IDF obtiene de un tweet con emojis. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** de `Me encanta la IA 😍`, TF-IDF solo obtiene `encanta`, `ia`, `la` y `me`. El vocabulario es de 13226 palabras con emojis y sin ellos.
+- **Decisión:** ❌ Descartada
+- **Justificación:** TF-IDF no ve los emojis, así que para el modelo es lo mismo que eliminarlos (J-52).
+
+### J-52 · Eliminar los emojis (camino B)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #11 / #36
+- **Propuesta:** borrar los emojis del texto sin dejar rastro.
+- **Cómo se probó:** mismo análisis que J-50. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** 27 tweets se quedan sin palabras propias: pasan de 36 a 63, sin contar URLs ni menciones.
+- **Decisión:** ❌ Descartada
+- **Justificación:** la cantidad queda en `cant_emojis`, pero se pierde qué emoji se usó, que se relaciona con la clase.
+
+### J-53 · Reemplazar cada emoji por un token (camino C)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #11 / #36
+- **Propuesta:** reemplazar cada emoji por el token `EMOJITOKEN`, como se hizo con las URLs y las menciones.
+- **Cómo se probó:** mismo análisis que J-50. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** el vocabulario suma una sola palabra (13227), pero todos los emojis quedan iguales.
+- **Decisión:** ❌ Descartada
+- **Justificación:** solo guarda la presencia, que ya está en `cant_emojis`, y pierde qué emoji se usó.
+
+### J-54 · Un token por emoji (camino E)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #11 / #36
+- **Propuesta:** reemplazar cada emoji por su nombre en español como una sola palabra, por ejemplo `cara_sonriendo_con_ojos_de_corazón`.
+- **Cómo se probó:** mismo análisis que J-50. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** el vocabulario pasa a 13548 palabras, 104 más que D. El 53,11% de los emojis aparece una sola vez.
+- **Decisión:** ❌ Descartada
+- **Justificación:** evita mezclar el emoji con palabras comunes, pero muchos tokens se repetirían muy poco y los emojis parecidos no comparten palabras. Queda como alternativa para comparar en el modelado.
 
 ## 5. Modelado
 

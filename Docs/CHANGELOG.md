@@ -21,6 +21,7 @@ Línea de tiempo de los cambios del proyecto.
 - Define el tratamiento de URLs en el preprocesamiento de texto (#36)
 - Define el tratamiento de hashtags en el preprocesamiento de texto (#36)
 - Define el tratamiento de menciones en el preprocesamiento de texto (#36)
+- Define el tratamiento de emojis en el preprocesamiento de texto (#36)
 - Rehace el análisis de URLs y hashtags sobre train y aplica el tratamiento a validación y test (#36)
 
 ## 2026-11-06
