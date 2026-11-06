@@ -5,6 +5,7 @@ comm==0.2.3
 contourpy==1.4.0
 cycler==0.12.1
 debugpy==1.8.22
+emoji==2.16.0
 executing==2.3.0
 fonttools==4.67.0
 ipykernel==7.4.0

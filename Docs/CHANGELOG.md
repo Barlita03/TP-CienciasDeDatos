@@ -17,6 +17,9 @@ Línea de tiempo de los cambios del proyecto.
 ```
 
 ---
+## 2026-11-06
+- Divide el dataset en train, validación y test, quita los tweets repetidos antes de la división y rehace el análisis sobre train (#33)
+
 ## 2026-11-04
 - Agrega feature de cantidad de emojis (#33)
 

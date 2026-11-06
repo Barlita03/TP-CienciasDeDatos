@@ -26,14 +26,61 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ## 1. Exploración del dataset
 
+### J-28 · Quitar los tweets con el texto exactamente repetido
+- **Etapa:** 1. Exploración del dataset
+- **Issue / PR:** — / #33
+- **Propuesta:** dejar una sola copia de cada texto antes de dividir el dataset, para que un tweet repetido no pese varias veces en los resultados ni quede en train y en validación o test a la vez.
+- **Cómo se probó:** cantidad de textos repetidos, clases de sus copias y proporción de clases antes y después de quitarlos.
+- **Evidencia:** hay 11 textos repetidos y 57 filas de más, y ningún texto repetido tiene más de una clase. Uno solo aparece 48 veces, siempre como positivo. El dataset pasa de 4038 a 3981 tweets, y la proporción de clases casi no cambia: P pasa de 18,7% a 17,8%, NEU de 66,6% a 67,3% y N de 14,7% a 14,9%.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** es una sola línea, evita que esas copias inflen los porcentajes y que el modelo se evalúe con tweets que ya vio al entrenar (J-29). Se aplica antes de la división (J-33), así que todo el análisis usa el dataset sin repetidos.
+
+### J-29 · Mantener los tweets repetidos
+- **Etapa:** 1. Exploración del dataset
+- **Issue / PR:** — / #33
+- **Propuesta:** no quitar nada y usar los 4038 tweets.
+- **Cómo se probó:** división de los 4038 tweets igual que en J-33 y cantidad de filas de validación y test cuyo texto también está en train.
+- **Evidencia:** 9 de las 404 filas de validación y 11 de las 808 de test tienen un texto que también está en train.
+- **Decisión:** ❌ Descartada
+- **Justificación:** el modelo se evaluaría en parte con tweets que ya vio al entrenar, lo que haría parecer mejor su desempeño. Además, un solo texto pesaría 48 veces en los porcentajes del análisis.
+
+### J-30 · Quitar también los tweets casi iguales
+- **Etapa:** 1. Exploración del dataset
+- **Issue / PR:** — / #33
+- **Propuesta:** tratar como repetidos a los tweets que solo difieren en links, menciones, mayúsculas o espacios.
+- **Cómo se probó:** cantidad de filas de más con este criterio y clases de los textos más repetidos.
+- **Evidencia:** sobran 89 filas, contra 57 en J-28. Entre los repetidos aparecen frases cortas como "totalmente de acuerdo" (3 P y 1 NEU) y tweets con solo emojis.
+- **Decisión:** ❌ Descartada
+- **Justificación:** agrega un criterio más complejo y puede borrar tweets que no son copias, a cambio de quitar solo 32 filas más.
+
+### J-33 · Dividir en train, validación y test de forma estratificada
+- **Etapa:** 1. Exploración del dataset
+- **Issue / PR:** — / #33
+- **Propuesta:** dividir el dataset sin repetidos en train (70%), validación (10%) y test (20%), estratificando por `polarity`, y hacer todo el análisis solo sobre train.
+- **Cómo se probó:** dos `train_test_split` con `stratify` y `random_state=42`: primero el 20% para test y, del resto, el 12,5% para validación (el 10% del total). Tamaño y proporción de clases de cada set.
+- **Evidencia:** quedan 2786 tweets en train, 398 en validación y 797 en test. La proporción de clases es la misma en los tres: P 17,8%, NEU 67,3%-67,4% y N 14,8%-14,9%. En validación hay 59 negativos.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** si el análisis mira validación o test, las decisiones quedan influidas por esos datos y la evaluación deja de mostrar cómo le iría al modelo con tweets nuevos. Validación se usa para comparar modelos y ajustar hiperparámetros, y test solo para la evaluación final. Estratificar asegura la misma proporción de clases en los tres sets, algo importante por el desbalance (J-34). La evidencia de J-01 a J-32 se calcula sobre train.
+
+### J-34 · Dividir sin estratificar
+- **Etapa:** 1. Exploración del dataset
+- **Issue / PR:** — / #33
+- **Propuesta:** hacer la misma división 70/10/20 sin `stratify`.
+- **Cómo se probó:** proporción de clases de cada set con `random_state=42`, comparada con la del total.
+- **Evidencia:** la proporción queda cerca de la del total, pero no igual: la mayor diferencia es de 0,9 puntos, en los positivos de test (16,9% contra 17,8%).
+- **Decisión:** ❌ Descartada
+- **Justificación:** deja la proporción de clases librada al azar, sin ninguna ventaja frente a estratificar, que lo resuelve en una línea.
+
 ## 2. Análisis de las variables disponibles
+
+La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33).
 
 ### J-01 · Histograma sin transformar y normalización min-max para graficar `favorite_count` y `retweet_count`
 - **Etapa:** 2. Análisis de las variables disponibles
 - **Issue / PR:** #1 / #30
 - **Propuesta:** graficar las métricas de interacción con un histograma común y, para mejorar la visualización, normalizarlas con min-max.
 - **Cómo se probó:** histograma de cada variable sin transformar y de su versión normalizada con (x − min) / (max − min), y porcentaje de datos que cae en el primer bin.
-- **Evidencia:** sin transformar, el 99,55% de `favorite_count` y el 99,11% de `retweet_count` cae en el primer bin. Con min-max los porcentajes son los mismos y el histograma tiene la misma forma, solo cambia el eje X a [0, 1].
+- **Evidencia:** sin transformar, el 99,53% de `favorite_count` y el 99,28% de `retweet_count` cae en el primer bin. Con min-max los porcentajes son los mismos y el histograma tiene la misma forma, solo cambia el eje X a [0, 1].
 - **Decisión:** ❌ Descartada
 - **Justificación:** el histograma común muestra una sola barra y la cola no se ve. Min-max cambia la escala pero no la forma de la distribución, y depende del máximo, que es un valor extremo (2243 y 502), así que no ayuda a visualizarla.
 
@@ -42,16 +89,16 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #1 / #30
 - **Propuesta:** graficar `log1p(x)` = log(1 + x) de todos los tweets, para comprimir la cola. Se usa `log1p` y no `log` porque la mayoría de los valores son 0 y log(0) no existe.
 - **Cómo se probó:** histograma de `log1p` de cada variable, junto con el porcentaje de ceros y el resumen estadístico.
-- **Evidencia:** el 53,15% de los tweets tiene 0 favoritos y el 84,74% tiene 0 retweets. Media vs. mediana: 3,82 vs. 0 en favoritos y 0,87 vs. 0 en retweets. El máximo es 2243 en favoritos y 502 en retweets.
+- **Evidencia:** el 52,26% de los tweets tiene 0 favoritos y el 85,10% tiene 0 retweets. Media vs. mediana: 4,26 vs. 0 en favoritos y 0,95 vs. 0 en retweets. El máximo es 2243 en favoritos y 502 en retweets.
 - **Decisión:** ✅ Aprobada, como complemento de J-03
-- **Justificación:** muestra todo el dataset y la proporción real de tweets sin interacción. Pero la barra del 0 domina el gráfico y el cuerpo de los tweets con interacción se distingue poco, por eso no alcanza sola.
+- **Justificación:** muestra todos los tweets y la proporción real de tweets sin interacción. Pero la barra del 0 domina el gráfico y el cuerpo de los tweets con interacción se distingue poco, por eso no alcanza sola.
 
 ### J-03 · Filtrar los tweets con interacción y usar eje logarítmico (opción B)
 - **Etapa:** 2. Análisis de las variables disponibles
 - **Issue / PR:** #1 / #30
 - **Propuesta:** graficar solo los tweets con valor mayor a 0, con el eje X en escala logarítmica, para ver la forma de la distribución sin que los ceros la tapen.
 - **Cómo se probó:** histograma con `log_scale=True` de los valores mayores a 0 de cada variable, y resumen de esos valores.
-- **Evidencia:** hay 1892 tweets con favoritos (46,85% del total) y 616 con retweets (15,26%). En ambos casos la mediana es 2. El percentil 90 es 10 en favoritos y 8,5 en retweets.
+- **Evidencia:** hay 1330 tweets con favoritos (47,74% del total) y 415 con retweets (14,90%). En ambos casos la mediana es 2. El percentil 90 es 9,1 en favoritos y 7,6 en retweets.
 - **Decisión:** ✅ Aprobada, como complemento de J-02
 - **Justificación:** deja ver cómo se reparten los tweets que sí interactúan: la mayoría tiene entre 1 y 2 y la frecuencia cae de forma gradual hasta los extremos. No muestra los ceros, así que hay que aclararlo y acompañarlo con el porcentaje de ceros y la opción A.
 
@@ -60,25 +107,25 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #2 / #30
 - **Propuesta:** responder si los tweets positivos reciben más interacción que los negativos con dos medidas complementarias: el porcentaje de tweets con valor mayor a 0 (cuántos reciben interacción) y los percentiles 50, 75, 90 y 99 de los tweets con valor mayor a 0 (cuánta reciben). Se incluye la clase NEU como referencia.
 - **Cómo se probó:** cálculo de ambas medidas por clase para `favorite_count` y `retweet_count`.
-- **Evidencia:** tweets con favoritos: P 45,71%, NEU 47,86%, N 43,75%. Tweets con retweets: P 13,34%, NEU 16,03%, N 14,19%. Mediana de los tweets con interacción: favoritos P 1, NEU 2, N 2; retweets P 2, NEU 2, N 1.
+- **Evidencia:** tweets con favoritos: P 48,28%, NEU 48,72%, N 42,65%. Tweets con retweets: P 13,33%, NEU 15,72%, N 13,01%. Mediana de los tweets con interacción: favoritos P 1, NEU 2, N 1; retweets P 2, NEU 2, N 1.
 - **Decisión:** ✅ Aprobada
-- **Justificación:** son medidas relativas, así que no dependen del tamaño de cada clase, y no se ven arrastradas por valores extremos. Muestran diferencias pequeñas cuyo sentido se invierte según el indicador, por lo que no se observa que los positivos reciban más interacción que los negativos.
+- **Justificación:** son medidas relativas, así que no dependen del tamaño de cada clase, y no se ven arrastradas por valores extremos. P queda igual o por encima de N en todos los indicadores, pero la única diferencia marcada es el porcentaje de tweets con favoritos (5,6 puntos); el resto es de menos de 1 punto o de 1 favorito o retweet. Los positivos reciben un poco más de interacción, pero no hay evidencia clara de que el sentimiento influya.
 
 ### J-05 · Comparar la media y el máximo de interacción por clase
 - **Etapa:** 2. Análisis de las variables disponibles
 - **Issue / PR:** #2 / #30
 - **Propuesta:** comparar las clases con la media y el máximo de `favorite_count` y `retweet_count`.
 - **Cómo se probó:** media, mediana y máximo por clase, y media recalculada sin el tweet con el valor máximo de cada clase.
-- **Evidencia:** la media de favoritos de P es 5,02 y la de N, 2,97. Sin el tweet máximo de cada clase, pasan a 2,06 y 2,38. En retweets, de 1,20 y 0,68 pasan a 0,54 y 0,54. El máximo de P es 2243 favoritos, un solo tweet.
+- **Evidencia:** la media de favoritos de P es 6,46 y la de N, 2,79. Sin el tweet máximo de cada clase, pasan a 1,94 y 1,95. En retweets, de 1,59 y 0,60 pasan a 0,57 y 0,40. El máximo de P es 2243 favoritos, un solo tweet.
 - **Decisión:** ❌ Descartada
-- **Justificación:** quitando un solo tweet, la media cambia de sentido. El máximo representa un único tweet y depende del tamaño del grupo. Ninguna de las dos describe el comportamiento de la clase.
+- **Justificación:** quitando un solo tweet, la ventaja de P en favoritos desaparece y en retweets se achica de 0,99 a 0,17. El máximo representa un único tweet y depende del tamaño del grupo. Ninguna de las dos describe el comportamiento de la clase.
 
 ### J-06 · Identificar los outliers de forma descriptiva
 - **Etapa:** 2. Análisis de las variables disponibles
 - **Issue / PR:** #3 / #30
 - **Propuesta:** responder si se observan outliers sin fijar un umbral, cuantificando qué tan lejos están los valores extremos del resto y verificando que correspondan a valores reales y no a errores de carga.
 - **Cómo se probó:** mínimos de cada métrica, relación entre el máximo y el percentil 99, y revisión de los tweets con más interacción junto con los datos de su cuenta.
-- **Evidencia:** el mínimo de ambas métricas es 0. El máximo es 2243 favoritos y 502 retweets, unas 55 y 34 veces el percentil 99. Los cinco tweets con más favoritos son también los cinco con más retweets, y dos de ellos son de cuentas verificadas con más de 140.000 seguidores (la mediana del dataset es 622).
+- **Evidencia:** el mínimo de ambas métricas es 0. El máximo es 2243 favoritos y 502 retweets, unas 64 y 42 veces el percentil 99. Los cinco tweets con más favoritos son también los cinco con más retweets, y dos de ellos son de cuentas verificadas con más de 140.000 seguidores (la mediana de train es 626,5).
 - **Decisión:** ✅ Aprobada
 - **Justificación:** las reglas automáticas no dan un criterio confiable para esta distribución (J-07), y un corte por percentil depende de un umbral arbitrario (p95, p98 o p99 dan respuestas distintas). La evidencia muestra que hay outliers y que son tweets reales con alta difusión, parte de la cola larga de la distribución. Se resigna una lista exacta de outliers, que no hace falta para responder la pregunta; su tratamiento se decide en el modelado.
 
@@ -87,7 +134,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #3 / #30
 - **Propuesta:** marcar como outliers los valores mayores que Q3 + 1,5 × (Q3 − Q1), sobre los datos originales y sobre `log1p`, o los que están a más de 3 desvíos estándar por encima de la media.
 - **Cómo se probó:** aplicación de cada regla a `favorite_count` y `retweet_count`, y desvío estándar recalculado sin el tweet con el valor máximo.
-- **Evidencia:** con el IQR, en retweets Q1 = Q3 = 0 y el límite es 0, así que se marca el 15,26% de los tweets (todos los que tienen al menos un retweet); en favoritos se marca el 16,79%. Sobre `log1p`, el límite de retweets sigue en 0 y en favoritos se marca el 10,15%. El puntaje z marca 11 tweets en favoritos y 14 en retweets, pero sacando un solo tweet el desvío de favoritos baja de 45,04 a 28,05.
+- **Evidencia:** con el IQR, en retweets Q1 = Q3 = 0 y el límite es 0, así que se marca el 14,90% de los tweets (todos los que tienen al menos un retweet); en favoritos se marca el 16,44%. Sobre `log1p`, el límite de retweets sigue en 0 y en favoritos se marca el 9,83%. El puntaje z marca 8 tweets en favoritos y 11 en retweets, pero sacando un solo tweet el desvío de favoritos baja de 53,65 a 32,84.
 - **Decisión:** ❌ Descartada
 - **Justificación:** el IQR colapsa porque la mayoría de los valores es 0. El puntaje z supone una distribución aproximadamente normal, y su límite depende de la media y el desvío, que se calculan con los mismos extremos que busca detectar.
 
@@ -96,7 +143,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #2 / #30
 - **Propuesta:** complementar la respuesta del #2 analizando si la interacción depende de la cuenta que publica el tweet: correlación con `user_followers_count` y comparación de la proporción de clases y la mediana de seguidores en distintos niveles de interacción.
 - **Cómo se probó:** correlación de Pearson sobre `log1p` entre `favorite_count`, `retweet_count` y `user_followers_count`. Proporción de clases y mediana de seguidores en los tweets sin interacción, con interacción, en el 5% y en el 1% con más interacción, para `favorite_count` y `retweet_count`.
-- **Evidencia:** sobre `log1p`, la correlación con los seguidores es 0,41 en favoritos y 0,33 en retweets. La mediana de seguidores pasa de 274 (sin favoritos) a 18.932 (1% con más favoritos) y de 473 (sin retweets) a 25.586 (1% con más retweets), mientras que la proporción de clases queda a no más de 4 puntos de la del dataset completo (P 18,7%, NEU 66,6%, N 14,7%) en todos los cortes.
+- **Evidencia:** sobre `log1p`, la correlación con los seguidores es 0,39 en favoritos y 0,31 en retweets. La mediana de seguidores pasa de 315 (sin favoritos) a 14.135 (1% con más favoritos) y de 494 (sin retweets) a 9.925 (1% con más retweets), mientras que la proporción de clases queda a no más de 6 puntos de la de todo train (P 17,8%, NEU 67,3%, N 14,9%) en todos los cortes.
 - **Decisión:** ✅ Aprobada
 - **Justificación:** se usa `log1p` porque sobre los valores originales la correlación queda dominada por los extremos (J-09). Usar varios cortes evita depender de un único umbral arbitrario para definir un tweet viral (J-06). El resultado muestra que la interacción está asociada al tamaño de la cuenta y no al sentimiento, lo que refuerza la conclusión de J-04 y explica el origen de los valores extremos (J-06).
 
@@ -105,7 +152,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #2 / #30
 - **Propuesta:** medir la relación entre la interacción y los seguidores con la correlación de Pearson sobre los valores originales, sin transformar.
 - **Cómo se probó:** matriz de correlación de `favorite_count`, `retweet_count` y `user_followers_count` sin transformar, comparada con la calculada sobre `log1p` (J-08), y recalculada sin el tweet con más favoritos.
-- **Evidencia:** sin transformar, la correlación con los seguidores es 0,04 en favoritos y 0,05 en retweets, frente a 0,41 y 0,33 sobre `log1p`. Entre favoritos y retweets es 0,94, y quitar solo el tweet con más favoritos la baja a 0,84. La cuenta con más seguidores (más de 10 millones) tiene apenas 35 favoritos.
+- **Evidencia:** sin transformar, la correlación con los seguidores es 0,04 en favoritos y en retweets, frente a 0,39 y 0,31 sobre `log1p`. Entre favoritos y retweets es 0,95, y quitar solo el tweet con más favoritos la baja a 0,85. La cuenta con más seguidores (más de 10 millones) tiene apenas 35 favoritos.
 - **Decisión:** ❌ Descartada
 - **Justificación:** la correlación de Pearson es sensible a los valores extremos, y en estas variables unos pocos tweets y cuentas están muy alejados del resto, así que el resultado depende de ellos y no del conjunto. Sobre `log1p` cada tweet pesa de forma más pareja.
 
@@ -116,7 +163,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #4 / #33
 - **Propuesta:** crear la feature `largo_texto`, la cantidad de caracteres del tweet después de quitar las URLs y las menciones, para medir solo lo que escribió la persona.
 - **Cómo se probó:** percentiles 25, 50 y 75 y boxplot de `largo_texto` por clase.
-- **Evidencia:** medianas de 189 (P), 163 (NEU) y 171 (N) caracteres, y percentiles 75 de 248, 242 y 248,25. El percentil 25 de NEU es 71, frente a 95,75 en P y 96 en N. 51 tweets quedan con largo 0 porque solo tenían links o menciones.
+- **Evidencia:** medianas de 188 (P), 164 (NEU) y 171 (N) caracteres, y percentiles 75 de 248, 242,25 y 246,5. El percentil 25 de NEU es 70,75, frente a 92,5 en P y 97,5 en N. 36 tweets quedan con largo 0 porque solo tenían links o menciones.
 - **Decisión:** ✅ Aprobada
 - **Justificación:** P y N tienen una longitud casi igual, así que la feature no ayuda a separarlos, pero NEU tiene más tweets cortos, por lo que puede aportar para distinguir a los neutrales. Quitar URLs y menciones evita medir contenido que no es texto propio (J-11). Su aporte real se evalúa en el modelado.
 
@@ -125,25 +172,25 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #4 / #33
 - **Propuesta:** medir la longitud como la cantidad de caracteres del texto tal como viene, sin quitar nada.
 - **Cómo se probó:** percentiles 25, 50 y 75 y boxplot por clase, comparados con J-10, y cantidad de tweets que superan el límite de 280 caracteres de Twitter.
-- **Evidencia:** medianas de 198 (P), 183 (NEU) y 193 (N). El percentil 25 de NEU es un 23% más bajo que el de P (94 frente a 122,75), contra un 26% en J-10. 464 tweets superan los 280 caracteres y el 51% de ellos empieza con una mención; sin URLs ni menciones, solo 3 quedan por encima.
+- **Evidencia:** medianas de 198 (P), 186 (NEU) y 195 (N). El percentil 25 de NEU es un 24% más bajo que el de P (92 frente a 121,5), igual que en J-10. 337 tweets superan los 280 caracteres y el 53% de ellos empieza con una mención; sin URLs ni menciones, solo 3 quedan por encima.
 - **Decisión:** ❌ Descartada
-- **Justificación:** la medida se infla con links y menciones, que no son texto escrito por la persona, y la diferencia de los neutrales es apenas menor que en J-10.
+- **Justificación:** la medida se infla con links y menciones, que no son texto escrito por la persona, y no separa mejor a los neutrales que J-10.
 
 ### J-12 · Longitud en palabras, sin URLs ni menciones
 - **Etapa:** 3. Ingeniería de features
 - **Issue / PR:** #4 / #33
 - **Propuesta:** medir la longitud como la cantidad de palabras del texto sin URLs ni menciones.
 - **Cómo se probó:** percentiles 25, 50 y 75 y boxplot por clase, comparados con J-10.
-- **Evidencia:** medianas de 29 (P), 27 (NEU) y 29 (N) palabras. El percentil 25 de NEU es 12, frente a 16 en P y 16 en N: un 25% más bajo que P, contra un 26% en caracteres (J-10).
+- **Evidencia:** medianas de 29 (P), 27 (NEU) y 29 (N) palabras. El percentil 25 de NEU es 12, frente a 15 en P y 16,5 en N: un 20% más bajo que P, contra un 24% en caracteres (J-10).
 - **Decisión:** ❌ Descartada
-- **Justificación:** muestra el mismo patrón que contar caracteres con prácticamente la misma diferencia, así que no agrega información.
+- **Justificación:** muestra el mismo patrón que contar caracteres con una diferencia algo menor, así que no agrega información.
 
 ### J-13 · Cantidad de hashtags del tweet
 - **Etapa:** 3. Ingeniería de features
 - **Issue / PR:** #5 / #33
 - **Propuesta:** crear la feature `cant_hashtags`, la cantidad de palabras del tweet que empiezan con `#`.
 - **Cómo se probó:** porcentaje de tweets con al menos un hashtag y media por clase, proporción de clases según la cantidad de hashtags (0, 1, 2 y 3 o más) y correlación con `largo_texto` sobre `log1p`.
-- **Evidencia:** el 15,4% de los tweets tiene hashtags y el máximo es 21. Tiene algún hashtag el 25,0% de los positivos, el 14,8% de los neutrales y el 6,9% de los negativos. Los positivos pasan de ser el 15,8% de los tweets sin hashtags al 37,4% de los que tienen 2. Con 3 o más hashtags, el 71,2% es neutral y solo el 2,5% es negativo (contra 67,3% y 14,9% en el dataset). La correlación con `largo_texto` es de 0,17.
+- **Evidencia:** el 14,8% de los tweets tiene hashtags y el máximo es 19. Tiene algún hashtag el 24,0% de los positivos, el 14,2% de los neutrales y el 6,5% de los negativos. Los positivos pasan de ser el 15,8% de los tweets sin hashtags al 39,8% de los que tienen 2. Con 3 o más hashtags, el 70,6% es neutral y solo el 0,9% es negativo (contra 67,3% y 14,9% en train). La correlación con `largo_texto` es de 0,17.
 - **Decisión:** ✅ Aprobada
 - **Justificación:** un tweet con hashtags rara vez es negativo, así que la feature puede ayudar a separar positivos de negativos, algo que la longitud no logra (J-10). Al tener una correlación baja con `largo_texto`, no repite su información. Los valores altos son reales (tweets de difusión con muchos hashtags) y se mantienen. Su aporte real se evalúa en el modelado.
 
@@ -152,7 +199,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #5 / #33
 - **Propuesta:** en lugar de contar los hashtags, indicar solo si el tweet tiene alguno.
 - **Cómo se probó:** proporción de clases en los tweets con y sin hashtags, comparada con J-13.
-- **Evidencia:** entre los tweets con hashtags hay un 28,8% de positivos y un 6,7% de negativos, contra 15,8% y 16,4% en los que no tienen. Pero el grupo "con hashtags" mezcla a los tweets con 1 hashtag con los que tienen 3 o más, donde la proporción de neutrales sube al 71,2%.
+- **Evidencia:** entre los tweets con hashtags hay un 28,8% de positivos y un 6,5% de negativos, contra 15,8% y 16,4% en los que no tienen. Pero el grupo "con hashtags" mezcla a los tweets con 1 hashtag con los que tienen 3 o más, donde la proporción de neutrales sube al 70,6%.
 - **Decisión:** ❌ Descartada
 - **Justificación:** capta la misma diferencia entre P y N que la cantidad, pero pierde el patrón de los tweets con muchos hashtags. La cantidad ya incluye esta información, porque un modelo puede separar 0 de "1 o más" a partir de ella.
 
@@ -161,16 +208,16 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #5 / #33
 - **Propuesta:** no contar los hashtags sobre el tema del dataset (`#ia`, `#ai`, `#inteligenciaartificial`, `#artificialintelligence`, `#chatgpt`, `#openai`), que son los más usados y podrían aparecer por cómo se recolectaron los tweets y no por su sentimiento.
 - **Cómo se probó:** las mismas tablas que en J-13, con la cantidad de hashtags sin los del tema.
-- **Evidencia:** los tweets con hashtags bajan de 614 a 459. Tiene algún hashtag el 20,1% de los positivos, el 10,7% de los neutrales y el 5,1% de los negativos: los positivos los usan 3,9 veces más que los negativos, contra 3,6 veces contando todos.
+- **Evidencia:** los tweets con hashtags bajan de 413 a 310. Tiene algún hashtag el 18,8% de los positivos, el 10,4% de los neutrales y el 5,3% de los negativos: los positivos los usan 3,5 veces más que los negativos, contra 3,7 veces contando todos.
 - **Decisión:** ❌ Descartada
-- **Justificación:** el patrón casi no cambia, quedan menos tweets con información y la feature pasa a depender de una lista armada a mano, que habría que justificar. La mejora es mínima frente a la decisión arbitraria que agrega.
+- **Justificación:** el patrón casi no cambia y no mejora la separación, quedan menos tweets con información y la feature pasa a depender de una lista armada a mano, que habría que justificar.
 
 ### J-16 · Cantidad de menciones al inicio del tweet, con tope en 2
 - **Etapa:** 3. Ingeniería de features
 - **Issue / PR:** #6 / #33
 - **Propuesta:** crear la feature `menciones_inicio`, la cantidad de menciones con las que empieza el tweet (así se ven las respuestas en Twitter), con tope en 2.
 - **Cómo se probó:** proporción de clases según las menciones al inicio (0, 1 y 2 o más) y correlación con `largo_texto` y `cant_hashtags` sobre `log1p`.
-- **Evidencia:** el 44,9% de los tweets empieza con una mención. Los negativos son el 10,0% de los tweets sin menciones al inicio, el 19,2% de los que tienen 1 y el 23,4% de los que tienen 2 o más; los positivos, el 21,1%, el 15,6% y el 10,9%. La correlación es de -0,41 con `largo_texto` y de -0,27 con `cant_hashtags`.
+- **Evidencia:** el 45,4% de los tweets empieza con una mención. Los negativos son el 10,3% de los tweets sin menciones al inicio, el 18,6% de los que tienen 1 y el 23,6% de los que tienen 2 o más; los positivos, el 21,0%, el 15,7% y el 10,9%. La correlación es de -0,41 con `largo_texto` y de -0,25 con `cant_hashtags`.
 - **Decisión:** ✅ Aprobada
 - **Justificación:** la proporción de negativos sube con cada mención al inicio, así que la feature puede ayudar a reconocerlos. Contar solo las del inicio evita mezclarlas con las del resto del texto, que se comportan al revés (J-17 y J-20). Contarlas conserva la diferencia entre empezar con 1 o con 2 o más (J-18), y el tope evita que los pocos tweets con muchas menciones pesen demasiado (J-19). Las correlaciones con las otras features son moderadas, así que no repiten su información. El dataset no indica qué tweets son respuestas, por lo que es una aproximación. Su aporte real se evalúa en el modelado.
 
@@ -179,7 +226,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #6 / #33
 - **Propuesta:** contar todas las menciones del tweet, sin distinguir dónde están.
 - **Cómo se probó:** proporción de clases según la cantidad total de menciones (0, 1, 2, 3-4 y 5 o más).
-- **Evidencia:** la proporción de negativos sube de 10,7% sin menciones a 21,2% con 3-4, pero con 5 o más baja a 14,1%; la de positivos baja de 21,5% a 9,6% y después sube a 20,3%.
+- **Evidencia:** la proporción de negativos sube de 10,8% sin menciones a 21,2% con 3-4, pero con 5 o más baja a 13,6%; la de positivos baja de 21,4% a 11,5% y después sube a 15,9%.
 - **Decisión:** ❌ Descartada
 - **Justificación:** mezcla las menciones del inicio, que tienden a ser negativas, con las del resto del texto, que tienden a ser neutrales, y los dos efectos se tapan entre sí.
 
@@ -188,7 +235,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #6 / #33
 - **Propuesta:** en lugar de contar las menciones del inicio, marcar solo si el tweet empieza con alguna (`es_respuesta`).
 - **Cómo se probó:** proporción de clases en los tweets que empiezan y no empiezan con una mención, comparada con J-16.
-- **Evidencia:** los negativos son el 20,8% de los tweets que empiezan con una mención y el 10,0% de los que no. Pero dentro de los primeros, son el 19,2% con 1 mención al inicio (1099 tweets) y el 23,4% con 2 o más (689 tweets).
+- **Evidencia:** los negativos son el 20,5% de los tweets que empiezan con una mención y el 10,3% de los que no. Pero dentro de los primeros, son el 18,6% con 1 mención al inicio (791 tweets) y el 23,6% con 2 o más (475 tweets).
 - **Decisión:** ❌ Descartada
 - **Justificación:** es la misma información que `menciones_inicio` con los grupos 1 y "2 o más" juntos. Capta el salto más grande, pero pierde una diferencia que se apoya en grupos grandes, y contar las menciones no es más difícil de calcular ni de explicar.
 
@@ -197,16 +244,16 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #6 / #33
 - **Propuesta:** usar la cantidad de menciones al inicio tal cual, sin tope.
 - **Cómo se probó:** resumen de la variable y proporción de clases para cada cantidad de menciones al inicio.
-- **Evidencia:** el percentil 99 es 5 y el máximo es 21. Los negativos suben hasta las 3 menciones (26,6%), pero desde 4 los grupos tienen entre 13 y 49 tweets y los porcentajes varían sin un patrón (20,4%, 23,1% y 14,3%).
+- **Evidencia:** el percentil 99 es 5 y el máximo es 15. Los negativos suben hasta las 3 menciones (27,1%), pero desde 4 los grupos tienen entre 11 y 32 tweets y los porcentajes varían sin un patrón (18,8%, 9,1% y 17,4%).
 - **Decisión:** ❌ Descartada
-- **Justificación:** más allá de las 2 o 3 menciones no hay un patrón claro, y sin tope un modelo lineal (regresión logística o SVM) le daría a un tweet con 21 menciones un peso mucho mayor que a uno con 1 o 2. Los árboles sí podrían usarla sin problema, así que se puede comparar con J-16 en el modelado.
+- **Justificación:** más allá de las 2 o 3 menciones no hay un patrón claro, y sin tope un modelo lineal (regresión logística o SVM) le daría a un tweet con 15 menciones un peso mucho mayor que a uno con 1 o 2. Los árboles sí podrían usarla sin problema, así que se puede comparar con J-16 en el modelado.
 
 ### J-20 · Cantidad de menciones en el resto del texto como segunda feature
 - **Etapa:** 3. Ingeniería de features
 - **Issue / PR:** #6 / #33
 - **Propuesta:** sumar a `menciones_inicio` una segunda feature, `cant_menciones_texto`, con la cantidad de menciones que no están al inicio del tweet.
 - **Cómo se probó:** proporción de clases según las menciones en el resto del texto (0, 1 y 2 o más) y correlación con `menciones_inicio` sobre `log1p`.
-- **Evidencia:** solo el 8,9% de los tweets (353) tiene menciones en el resto del texto, y el máximo es 9. A medida que aumentan, sube la proporción de neutrales (66,6%, 71,6% y 79,7%) y baja la de negativos (de 15,7% a 2,3%). La correlación con `menciones_inicio` es de -0,18.
+- **Evidencia:** solo el 8,3% de los tweets (231) tiene menciones en el resto del texto, y el máximo es 9. A medida que aumentan, sube la proporción de neutrales (66,7%, 71,2% y 78,3%) y baja la de negativos (de 15,5% a 3,3%). La correlación con `menciones_inicio` es de -0,17.
 - **Decisión:** ❌ Descartada
 - **Justificación:** muestra una señal propia, distinta de la de las menciones al inicio, pero afecta a pocos tweets, así que por ahora se prioriza una sola feature más simple. Se puede volver a sumar si en el modelado hace falta.
 
@@ -215,7 +262,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #31 / #33
 - **Propuesta:** crear la feature `tiene_exclamacion`, que vale 1 si el tweet tiene al menos un `!`, contado sin las URLs.
 - **Cómo se probó:** proporción de clases en los tweets con y sin `!`, cantidad de tweets con `¡` pero sin `!`, y correlación con `largo_texto`, `cant_hashtags` y `menciones_inicio` sobre `log1p`.
-- **Evidencia:** el 7,6% de los tweets tiene `!`. Entre ellos, el 46,5% es positivo, el 41,6% neutral y el 11,9% negativo, contra 15,4%, 69,5% y 15,1% en los que no tienen. Solo 2 tweets tienen `¡` sin `!`. La correlación con las otras features está entre -0,01 y 0,09.
+- **Evidencia:** el 7,4% de los tweets tiene `!`. Entre ellos, el 46,4% es positivo, el 41,5% neutral y el 12,1% negativo, contra 15,5%, 69,4% y 15,1% en los que no tienen. Solo 2 tweets tienen `¡` sin `!`. La correlación con las otras features está entre 0,00 y 0,10.
 - **Decisión:** ✅ Aprobada
 - **Justificación:** es la diferencia entre clases más grande de las features analizadas: los tweets con `!` son positivos el triple de veces que el resto. No se correlaciona con las otras features, así que aporta información nueva. El `¡` no se cuenta porque casi siempre va con un `!`. Su aporte real se evalúa en el modelado.
 
@@ -224,16 +271,16 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #31 / #33
 - **Propuesta:** contar los `!` de cada tweet, con tope en 3, en lugar de marcar solo si hay alguno.
 - **Cómo se probó:** resumen de la variable y proporción de clases según la cantidad de `!` (0, 1, 2 y 3 o más).
-- **Evidencia:** el percentil 99 es 2 y el máximo, 9. Los positivos son el 48,8% de los tweets con un `!`, el 44,7% de los que tienen 2 y el 35,9% de los que tienen 3 o más, donde los negativos también son el 35,9%. Los grupos con 2 y con 3 o más tienen 47 y 39 tweets.
+- **Evidencia:** el percentil 99 es 2 y el máximo, 9. Los positivos son el 48,7% de los tweets con un `!`, el 40,6% de los que tienen 2 y el 40,0% de los que tienen 3 o más, donde los negativos suben al 36,0%. Los grupos con 2 y con 3 o más tienen 32 y 25 tweets.
 - **Decisión:** ❌ Descartada
-- **Justificación:** la relación sube y baja: un `!` suele acompañar a un tweet entusiasta, pero muchos también aparecen en críticas o quejas. Con grupos tan chicos, contar no agrega información confiable respecto de marcar si hay algún `!`.
+- **Justificación:** la relación no va en una sola dirección: un `!` suele acompañar a un tweet entusiasta, pero muchos también aparecen en críticas o quejas. Con grupos tan chicos, contar no agrega información confiable respecto de marcar si hay algún `!`.
 
 ### J-23 · Signos de exclamación repetidos como segunda feature
 - **Etapa:** 3. Ingeniería de features
 - **Issue / PR:** #31 / #33
 - **Propuesta:** sumar a `tiene_exclamacion` una segunda feature que marque si el tweet tiene `!` repetidos (`!!`).
 - **Cómo se probó:** proporción de clases en los tweets con y sin `!!`.
-- **Evidencia:** 52 tweets tienen `!!`. Entre ellos, el 32,7% es negativo, contra el 14,6% del resto.
+- **Evidencia:** 35 tweets tienen `!!`. Entre ellos, el 31,4% es negativo, contra el 14,7% del resto.
 - **Decisión:** ❌ Descartada
 - **Justificación:** muestra una señal hacia los negativos, pero afecta a muy pocos tweets, el mismo criterio que en J-20. Se puede volver a sumar si en el modelado hace falta.
 
@@ -242,7 +289,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #32 / #33
 - **Propuesta:** crear la feature `cant_preguntas`, la cantidad de `?` del tweet contados sin las URLs, con tope en 2.
 - **Cómo se probó:** proporción de clases según la cantidad de `?` (0, 1 y 2 o más), cantidad de tweets con `¿` pero sin `?`, y correlación con `largo_texto`, `cant_hashtags`, `menciones_inicio` y `tiene_exclamacion` sobre `log1p`.
-- **Evidencia:** el 12,5% de los tweets tiene `?`. Los positivos son el 19,0% de los tweets sin preguntas, el 11,3% de los que tienen una y el 1,8% de los que tienen 2 o más (109 tweets). Los neutrales son el 65,7%, el 78,4% y el 78,9%. Ningún tweet tiene `¿` sin `?`. La correlación con las otras features está entre 0,00 y 0,05.
+- **Evidencia:** el 12,6% de los tweets tiene `?`. Los positivos son el 18,9% de los tweets sin preguntas, el 12,2% de los que tienen una y el 2,5% de los que tienen 2 o más (81 tweets). Los neutrales son el 65,7%, el 78,9% y el 77,8%. Ningún tweet tiene `¿` sin `?`. La correlación con las otras features está entre -0,01 y 0,06.
 - **Decisión:** ✅ Aprobada
 - **Justificación:** la proporción de positivos baja con cada `?`, así que la relación va en una sola dirección y se usa la cantidad, el mismo criterio que con las menciones al inicio (J-16). El tope evita que los pocos tweets con muchas preguntas pesen demasiado (J-26). No se correlaciona con las otras features, así que aporta información nueva. Su aporte real se evalúa en el modelado.
 
@@ -251,7 +298,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #32 / #33
 - **Propuesta:** marcar solo si el tweet tiene algún `?`, en lugar de contarlos.
 - **Cómo se probó:** proporción de clases en los tweets con y sin `?`, comparada con J-24.
-- **Evidencia:** los positivos son el 9,2% de los tweets con `?` y el 19,0% de los que no tienen. Dentro de los primeros, son el 11,3% con una pregunta y el 1,8% con 2 o más.
+- **Evidencia:** los positivos son el 10,0% de los tweets con `?` y el 18,9% de los que no tienen. Dentro de los primeros, son el 12,2% con una pregunta y el 2,5% con 2 o más.
 - **Decisión:** ❌ Descartada
 - **Justificación:** junta a los tweets con una pregunta y con varias, y pierde que con 2 o más casi no hay positivos.
 
@@ -260,7 +307,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #32 / #33
 - **Propuesta:** usar la cantidad de `?` tal cual, sin tope.
 - **Cómo se probó:** resumen de la variable y proporción de clases para cada cantidad de `?`.
-- **Evidencia:** el percentil 99 es 2 y el máximo, 7. Los tweets con 3 `?` son 20 y los que tienen 4 o más, 17.
+- **Evidencia:** el percentil 99 es 2 y el máximo, 7. Los tweets con 3 `?` son 16 y los que tienen 4 o más, 11.
 - **Decisión:** ❌ Descartada
 - **Justificación:** desde 3 preguntas los grupos son demasiado chicos para sacar conclusiones, y sin tope los valores altos pesarían más que el resto en un modelo lineal.
 
@@ -269,43 +316,16 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #32 / #33
 - **Propuesta:** sumar a `cant_preguntas` una segunda feature que marque si el tweet tiene `?` repetidos (`??`).
 - **Cómo se probó:** proporción de clases en los tweets con y sin `??`.
-- **Evidencia:** 22 tweets tienen `??`. Ninguno es positivo y el 27,3% es negativo.
+- **Evidencia:** 16 tweets tienen `??`. Ninguno es positivo y el 25,0% es negativo.
 - **Decisión:** ❌ Descartada
 - **Justificación:** afecta a muy pocos tweets, el mismo criterio que en J-23.
-
-### J-28 · Quitar los tweets con el texto exactamente repetido
-- **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** — / #33
-- **Propuesta:** dejar una sola copia de cada texto antes de crear las features, para que un tweet repetido no pese varias veces en los resultados ni quede en train y en test a la vez.
-- **Cómo se probó:** cantidad de textos repetidos, clases de sus copias y proporción de clases antes y después de quitarlos.
-- **Evidencia:** hay 11 textos repetidos y 57 filas de más, y ningún texto repetido tiene más de una clase. Uno solo aparece 48 veces, siempre como positivo. El dataset pasa de 4038 a 3981 tweets, y la proporción de clases casi no cambia: P pasa de 18,7% a 17,8%, NEU de 66,6% a 67,3% y N de 14,7% a 14,9%.
-- **Decisión:** ✅ Aprobada
-- **Justificación:** es una sola línea y evita que esas copias inflen los porcentajes. Se aplica desde esta etapa, así que las etapas 1 y 2 siguen describiendo el dataset completo y las entradas J-10 a J-27 usan los 3981 tweets.
-
-### J-29 · Mantener los tweets repetidos
-- **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** — / #33
-- **Propuesta:** no quitar nada y usar los 4038 tweets.
-- **Cómo se probó:** comparación de dos resultados de esta etapa con y sin repetidos: la proporción de positivos entre los tweets con `!` y el percentil 25 del largo.
-- **Evidencia:** con repetidos, el 53,8% de los tweets con `!` es positivo; sin ellos, el 46,5%. El percentil 25 del largo en P pasa de 105 a 95,8, mientras que en NEU sigue en 71.
-- **Decisión:** ❌ Descartada
-- **Justificación:** esos resultados dependen en buena parte de un solo texto, y en el modelado una copia podría quedar en train y otra en test.
-
-### J-30 · Quitar también los tweets casi iguales
-- **Etapa:** 3. Ingeniería de features
-- **Issue / PR:** — / #33
-- **Propuesta:** tratar como repetidos a los tweets que solo difieren en links, menciones, mayúsculas o espacios.
-- **Cómo se probó:** cantidad de filas de más con este criterio, clases de los textos más repetidos y los mismos resultados que en J-29.
-- **Evidencia:** sobran 89 filas, contra 57 en J-28. Entre los repetidos aparecen frases cortas como "totalmente de acuerdo" (3 P y 1 NEU) y tweets con solo emojis. El porcentaje de positivos entre los tweets con `!` queda en 46,4%, contra 46,5% en J-28, y el percentil 25 del largo en P, en 100, contra 95,8.
-- **Decisión:** ❌ Descartada
-- **Justificación:** agrega un criterio más complejo y puede borrar tweets que no son copias, a cambio de quitar solo 32 filas más.
 
 ### J-31 · Cantidad de emojis, con tope en 2
 - **Etapa:** 3. Ingeniería de features
 - **Issue / PR:** #35 / #33
 - **Propuesta:** crear la feature `cant_emojis`, la cantidad de emojis del tweet contados sin las URLs, con tope en 2.
 - **Cómo se probó:** porcentaje de tweets con al menos un emoji y media por clase, proporción de clases según la cantidad de emojis (0, 1 y 2 o más) y correlación con el resto de las features sobre `log1p`. Se usó la librería `emoji` para no separar emojis compuestos.
-- **Evidencia:** el 23,5% de los tweets tiene emojis (937). El máximo es 17. Tienen algún emoji el 38,6% de los positivos, el 21,4% de los neutrales y el 15,0% de los negativos. La proporción de positivos sube de 14,3% (0 emojis) a 26,2% (1 emoji) y a 33,2% (2 o más). La de negativos baja de 16,5% a 9,9% y a 8,9%. La correlación más alta es de 0,20 (con `cant_hashtags`).
+- **Evidencia:** el 24,5% de los tweets tiene emojis (683). El máximo es 17. Tienen algún emoji el 39,6% de los positivos, el 22,3% de los neutrales y el 16,6% de los negativos. La proporción de positivos sube de 14,2% (0 emojis) a 25,8% (1 emoji) y a 32,9% (2 o más). La de negativos baja de 16,5% a 11,0% y a 8,8%. La correlación más alta es de 0,21 (con `cant_hashtags`).
 - **Decisión:** ✅ Aprobada
 - **Justificación:** la proporción de positivos sube con cada emoji, y la de negativos baja. Como la relación va en una sola dirección, se usa la cantidad y no solo si hay alguno (J-32). El tope evita que los pocos tweets con muchos emojis pesen demasiado (J-32). Tiene correlaciones bajas, así que aporta información nueva.
 
@@ -314,7 +334,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Issue / PR:** #35 / #33
 - **Propuesta:** evaluar tres formas alternativas de medir los emojis: usar la cantidad sin tope, indicar solo si el tweet tiene o no emojis, y contar la cantidad omitiendo el emoji del tema (🤖).
 - **Cómo se probó:** proporción de clases para los distintos agrupamientos de cada alternativa, comparadas con la feature aprobada (J-31).
-- **Evidencia:** con "tiene o no", la proporción de positivos sube a 29,1% cuando hay emojis, juntando a los grupos de 1 y de 2 o más. "Sin tope" llega hasta 17 emojis, pero a partir de 3, las proporciones varían sin un patrón claro. Al descartar el emoji 🤖, los tweets con emojis bajan de 937 a 926, y la proporción de positivos sube de 14,3% a 27,0% (1 emoji) y a 32,8% (2 o más).
+- **Evidencia:** con "tiene o no", la proporción de positivos es de 28,7% cuando hay emojis, juntando a los grupos de 1 y de 2 o más. "Sin tope" llega hasta 17 emojis, pero desde 2 los positivos dejan de subir (33,3%, 33,3% y 31,4%) en grupos chicos (87 y 70 tweets desde 3). Al descartar el emoji 🤖, los tweets con emojis bajan de 683 a 673, y la proporción de positivos sube de 14,2% a 26,9% (1 emoji) y a 32,0% (2 o más).
 - **Decisión:** ❌ Descartada
 - **Justificación:** "tiene o no" pierde que la proporción de positivos sigue subiendo. "Sin tope" deja que valores extremos pesen demasiado en modelos lineales sin agregar un patrón claro. "Sin el emoji del tema" tiene una mejora casi nula frente a J-31, sumando una regla basada en una lista manual de emojis descartables.
 
