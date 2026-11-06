@@ -7,3 +7,6 @@ prueba_*.ipynb
 
 # Entorno virtual para correr local
 .venv/
+
+# Instrucciones locales para Copilot
+.github/copilot-instructions.md
