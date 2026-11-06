@@ -342,7 +342,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-35 · Reemplazar cada URL por un token (camino C)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #8 / #PR
+- **Issue / PR:** #8 / #36
 - **Propuesta:** reemplazar cada URL del texto por el token `URLTOKEN`, en una columna nueva `texto_procesado`, para descartar el contenido del link y dejar explícita su presencia.
 - **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet, y comparación de los cinco caminos (J-35 a J-39) según si conservan la presencia del link y si descartan el código aleatorio.
 - **Evidencia:** tiene URL el 35,87% de los neutrales, el 31,11% de los positivos y el 19,52% de los negativos, con al menos 415 tweets por clase. Las 1037 URLs son de `t.co`, con un código aleatorio.
@@ -351,7 +351,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-36 · Mantener las URLs tal cual (camino A)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #8 / #PR
+- **Issue / PR:** #8 / #36
 - **Propuesta:** no tratar las URLs y dejarlas en el texto.
 - **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet, y revisión de las palabras que TF-IDF obtiene de una URL.
 - **Evidencia:** TF-IDF parte `https://t.co/Hv4UBFRjXb` en `https`, `co` y `hv4ubfrjxb`.
@@ -360,7 +360,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-37 · Eliminar las URLs (camino B)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #8 / #PR
+- **Issue / PR:** #8 / #36
 - **Propuesta:** borrar las URLs del texto sin dejar rastro.
 - **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet.
 - **Evidencia:** la proporción de tweets con URL cambia entre clases (35,87%, 31,11% y 19,52%) y la diferencia es de 16 puntos.
@@ -369,7 +369,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-38 · Eliminar las URLs y agregar la feature `tiene_url` (camino D)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #8 / #PR
+- **Issue / PR:** #8 / #36
 - **Propuesta:** borrar las URLs del texto y guardar su presencia en una columna binaria `tiene_url`.
 - **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet.
 - **Evidencia:** la misma que J-35.
@@ -378,7 +378,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-39 · Eliminar las URLs y agregar la feature `cant_urls` (camino E)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #8 / #PR
+- **Issue / PR:** #8 / #36
 - **Propuesta:** borrar las URLs del texto y guardar la cantidad de URLs en una columna `cant_urls`.
 - **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet.
 - **Evidencia:** 796 tweets tienen una URL y solo 112 tienen dos o más.
@@ -387,7 +387,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-40 · Sacar el `#`, separar y usar la feature `cant_hashtags` (camino E)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #9 / #PR
+- **Issue / PR:** #9 / #36
 - **Propuesta:** en `texto_procesado`, reemplazar cada hashtag por sus palabras. Se saca el `#`, se separan las palabras unidas con mayúsculas antes de pasar a minúsculas y se borran los `#` sueltos. La cantidad de hashtags ya está en `cant_hashtags` (J-13).
 - **Cómo se probó:** análisis del porcentaje de tweets con hashtag y de la cantidad promedio por clase, de los hashtags más usados, de su posición en el texto y de las variantes de "inteligencia artificial" por clase. Después, comparación de los cinco caminos (J-40 a J-44) según si conservan la palabra y la presencia y cantidad. El impacto en el desempeño no se midió todavía: se va a validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
 - **Evidencia:** tiene hashtag el 24,04% de los positivos, el 14,23% de los neutrales y el 6,51% de los negativos. Entre los tweets con hashtag, el promedio es 2,00, 2,27 y 1,37, y 197 de los 413 tienen dos o más. El 63,68% de los tweets con hashtag tiene alguno dentro de la frase. Se considera que un hashtag está "al final" cuando después solo hay otros hashtags, URLs, espacios o signos de puntuación. El 23,61% de los hashtags junta varias palabras con mayúsculas. "Inteligencia artificial" aparece en 174 hashtags escrita de seis formas, y en todas predomina la clase neutral.
@@ -396,7 +396,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-41 · Mantener los hashtags tal cual (camino A)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #9 / #PR
+- **Issue / PR:** #9 / #36
 - **Propuesta:** no tratar los hashtags y dejarlos en el texto.
 - **Cómo se probó:** mismo análisis que J-40 y revisión de las palabras que TF-IDF obtiene de un tweet con hashtags. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
 - **Evidencia:** TF-IDF convierte `#IA` en `ia` y `#Tecnología` en `tecnología`.
@@ -405,7 +405,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-42 · Eliminar los hashtags (camino B)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #9 / #PR
+- **Issue / PR:** #9 / #36
 - **Propuesta:** borrar los hashtags del texto sin dejar rastro.
 - **Cómo se probó:** mismo análisis que J-40. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
 - **Evidencia:** el 63,68% de los tweets con hashtag tiene alguno dentro de la frase, y la proporción de tweets con hashtag varía casi 18 puntos entre clases.
@@ -414,7 +414,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-43 · Sacar solo el `#` (camino C)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #9 / #PR
+- **Issue / PR:** #9 / #36
 - **Propuesta:** borrar el `#` y dejar la palabra tal cual, sin columna extra.
 - **Cómo se probó:** mismo análisis que J-40. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
 - **Evidencia:** TF-IDF obtiene las mismas palabras que en A: `#IA` y `IA` terminan como `ia`.
@@ -423,7 +423,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-44 · Reemplazar cada hashtag por un token (camino D)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #9 / #PR
+- **Issue / PR:** #9 / #36
 - **Propuesta:** reemplazar cada hashtag por el token `HASHTAGTOKEN`, como se hizo con las URLs.
 - **Cómo se probó:** mismo análisis que J-40. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
 - **Evidencia:** el 63,68% de los tweets con hashtag tiene alguno dentro de la frase.
@@ -432,7 +432,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-45 · Reemplazar cada mención por un token (camino C)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #10 / #PR
+- **Issue / PR:** #10 / #36
 - **Propuesta:** reemplazar cada mención del texto por el token `USERTOKEN` en `texto_procesado`, para descartar el nombre del usuario y dejar explícita la presencia de la mención.
 - **Cómo se probó:** análisis del porcentaje de tweets con mención por clase y posición, de los usuarios más mencionados, del tamaño del vocabulario y de los tweets vacíos, y comparación de los cinco caminos (J-45 a J-49). Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
 - **Evidencia:** el 52,66% de los tweets tiene alguna mención. Tiene mención al inicio el 62,41% de los negativos, el 44,30% de los neutrales y el 35,56% de los positivos. Hay 1244 usuarios distintos y el 57,40% aparece una sola vez. El vocabulario pasa de 13226 palabras con menciones a 11999 con el token, una más que al eliminarlas, y ningún tweet queda vacío.
@@ -441,7 +441,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-46 · Mantener las menciones tal cual (camino A)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #10 / #PR
+- **Issue / PR:** #10 / #36
 - **Propuesta:** no tratar las menciones y dejarlas en el texto.
 - **Cómo se probó:** mismo análisis que J-45 y revisión de las palabras que TF-IDF obtiene de un tweet con menciones. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
 - **Evidencia:** TF-IDF convierte `@OpenAI` en `openai`. Los nombres de usuario suman 1228 palabras al vocabulario, un 9,28% del total. `@lareimers` aparece 12 de 19 veces en negativos.
@@ -450,7 +450,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-47 · Eliminar las menciones (camino B)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #10 / #PR
+- **Issue / PR:** #10 / #36
 - **Propuesta:** borrar las menciones del texto sin dejar rastro.
 - **Cómo se probó:** mismo análisis que J-45. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
 - **Evidencia:** 7 tweets quedan vacíos y 231 tweets tienen menciones fuera del inicio, que ninguna columna cuenta. El vocabulario queda en 11998 palabras.
@@ -459,7 +459,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-48 · Eliminar las menciones y agregar la feature `tiene_mencion` (camino D)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #10 / #PR
+- **Issue / PR:** #10 / #36
 - **Propuesta:** borrar las menciones del texto y guardar su presencia en una columna binaria `tiene_mencion`.
 - **Cómo se probó:** mismo análisis que J-45. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
 - **Evidencia:** de los 1467 tweets con mención, 1266 tienen alguna al inicio, una señal que ya guarda `menciones_inicio`.
@@ -468,7 +468,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 
 ### J-49 · Eliminar solo las menciones del inicio (camino E)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #10 / #PR
+- **Issue / PR:** #10 / #36
 - **Propuesta:** borrar las menciones del inicio del tweet y dejar tal cual las del resto del texto.
 - **Cómo se probó:** mismo análisis que J-45. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
 - **Evidencia:** el vocabulario queda en 12309 palabras, 311 más que al eliminarlas todas, y 7 tweets quedan vacíos.

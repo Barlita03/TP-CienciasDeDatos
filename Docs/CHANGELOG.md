@@ -18,10 +18,10 @@ Línea de tiempo de los cambios del proyecto.
 
 ---
 ## AAAA-MM-DD
-- Define el tratamiento de URLs en el preprocesamiento de texto (#PR)
-- Define el tratamiento de hashtags en el preprocesamiento de texto (#PR)
-- Define el tratamiento de menciones en el preprocesamiento de texto (#PR)
-- Rehace el análisis de URLs y hashtags sobre train y aplica el tratamiento a validación y test (#PR)
+- Define el tratamiento de URLs en el preprocesamiento de texto (#36)
+- Define el tratamiento de hashtags en el preprocesamiento de texto (#36)
+- Define el tratamiento de menciones en el preprocesamiento de texto (#36)
+- Rehace el análisis de URLs y hashtags sobre train y aplica el tratamiento a validación y test (#36)
 
 ## 2026-11-06
 - Divide el dataset en train, validación y test, quita los tweets repetidos antes de la división y rehace el análisis sobre train (#33)
