@@ -32,10 +32,10 @@ Las etapas 1 a 6 salen de los títulos de los Lineamientos de la consigna, y la 
 
 Para cada elemento: decidir si se elimina, se transforma, se construye una feature o se mantiene tal cual.
 
-- [ ] URLs ([#8](https://github.com/Barlita03/TP-CienciasDeDatos/issues/8))
-- [ ] Hashtags ([#9](https://github.com/Barlita03/TP-CienciasDeDatos/issues/9))
-- [ ] Menciones a otros usuarios (@usuario) ([#10](https://github.com/Barlita03/TP-CienciasDeDatos/issues/10))
-- [ ] Emojis ([#11](https://github.com/Barlita03/TP-CienciasDeDatos/issues/11))
+- [x] URLs ([#8](https://github.com/Barlita03/TP-CienciasDeDatos/issues/8))
+- [x] Hashtags ([#9](https://github.com/Barlita03/TP-CienciasDeDatos/issues/9))
+- [x] Menciones a otros usuarios (@usuario) ([#10](https://github.com/Barlita03/TP-CienciasDeDatos/issues/10))
+- [x] Emojis ([#11](https://github.com/Barlita03/TP-CienciasDeDatos/issues/11))
 
 ## 5. Modelado
 

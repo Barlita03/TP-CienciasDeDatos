@@ -60,7 +60,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 - **Cómo se probó:** dos `train_test_split` con `stratify` y `random_state=42`: primero el 20% para test y, del resto, el 12,5% para validación (el 10% del total). Tamaño y proporción de clases de cada set.
 - **Evidencia:** quedan 2786 tweets en train, 398 en validación y 797 en test. La proporción de clases es la misma en los tres: P 17,8%, NEU 67,3%-67,4% y N 14,8%-14,9%. En validación hay 59 negativos.
 - **Decisión:** ✅ Aprobada
-- **Justificación:** si el análisis mira validación o test, las decisiones quedan influidas por esos datos y la evaluación deja de mostrar cómo le iría al modelo con tweets nuevos. Validación se usa para comparar modelos y ajustar hiperparámetros, y test solo para la evaluación final. Estratificar asegura la misma proporción de clases en los tres sets, algo importante por el desbalance (J-34). La evidencia de J-01 a J-32 se calcula sobre train.
+- **Justificación:** si el análisis mira validación o test, las decisiones quedan influidas por esos datos y la evaluación deja de mostrar cómo le iría al modelo con tweets nuevos. Validación se usa para comparar modelos y ajustar hiperparámetros, y test solo para la evaluación final. Estratificar asegura la misma proporción de clases en los tres sets, algo importante por el desbalance (J-34). La evidencia de J-01 a J-32 y de J-35 a J-54 se calcula sobre train.
 
 ### J-34 · Dividir sin estratificar
 - **Etapa:** 1. Exploración del dataset
@@ -339,6 +339,186 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-33
 - **Justificación:** "tiene o no" pierde que la proporción de positivos sigue subiendo. "Sin tope" deja que valores extremos pesen demasiado en modelos lineales sin agregar un patrón claro. "Sin el emoji del tema" tiene una mejora casi nula frente a J-31, sumando una regla basada en una lista manual de emojis descartables.
 
 ## 4. Preprocesamiento de texto
+
+### J-35 · Reemplazar cada URL por un token (camino C)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #8 / #36
+- **Propuesta:** reemplazar cada URL del texto por el token `URLTOKEN`, en una columna nueva `texto_procesado`, para descartar el contenido del link y dejar explícita su presencia.
+- **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet, y comparación de los cinco caminos (J-35 a J-39) según si conservan la presencia del link y si descartan el código aleatorio.
+- **Evidencia:** tiene URL el 35,87% de los neutrales, el 31,11% de los positivos y el 19,52% de los negativos, con al menos 415 tweets por clase. Las 1037 URLs son de `t.co`, con un código aleatorio.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** lo que puede aportar es la presencia del link, no su contenido. C conserva la presencia y descarta los códigos aleatorios de `t.co`, igual que D, pero se resuelve dentro del texto sin agregar columnas.
+
+### J-36 · Mantener las URLs tal cual (camino A)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #8 / #36
+- **Propuesta:** no tratar las URLs y dejarlas en el texto.
+- **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet, y revisión de las palabras que TF-IDF obtiene de una URL.
+- **Evidencia:** TF-IDF parte `https://t.co/Hv4UBFRjXb` en `https`, `co` y `hv4ubfrjxb`.
+- **Decisión:** ❌ Descartada
+- **Justificación:** `https` y `co` ya marcan que el tweet tiene link, pero además deja en el texto los códigos aleatorios de `t.co`, que no aportan información.
+
+### J-37 · Eliminar las URLs (camino B)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #8 / #36
+- **Propuesta:** borrar las URLs del texto sin dejar rastro.
+- **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet.
+- **Evidencia:** la proporción de tweets con URL cambia entre clases (35,87%, 31,11% y 19,52%) y la diferencia es de 16 puntos.
+- **Decisión:** ❌ Descartada
+- **Justificación:** pierde la información de que el tweet tenía link, que se relaciona con la clase.
+
+### J-38 · Eliminar las URLs y agregar la feature `tiene_url` (camino D)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #8 / #36
+- **Propuesta:** borrar las URLs del texto y guardar su presencia en una columna binaria `tiene_url`.
+- **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet.
+- **Evidencia:** la misma que J-35.
+- **Decisión:** ❌ Descartada, como alternativa equivalente
+- **Justificación:** guarda la misma información que C pero en una columna aparte. Queda como alternativa si en el modelado se combinan el texto con features numéricas.
+
+### J-39 · Eliminar las URLs y agregar la feature `cant_urls` (camino E)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #8 / #36
+- **Propuesta:** borrar las URLs del texto y guardar la cantidad de URLs en una columna `cant_urls`.
+- **Cómo se probó:** análisis del porcentaje de tweets con URL por clase, del dominio, la posición y la cantidad de URLs por tweet.
+- **Evidencia:** 796 tweets tienen una URL y solo 112 tienen dos o más.
+- **Decisión:** ❌ Descartada
+- **Justificación:** como casi todos los tweets con link tienen uno solo, el conteo agrega poco frente a la presencia.
+
+### J-40 · Sacar el `#`, separar y usar la feature `cant_hashtags` (camino E)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #9 / #36
+- **Propuesta:** en `texto_procesado`, reemplazar cada hashtag por sus palabras. Se saca el `#`, se separan las palabras unidas con mayúsculas antes de pasar a minúsculas y se borran los `#` sueltos. La cantidad de hashtags ya está en `cant_hashtags` (J-13).
+- **Cómo se probó:** análisis del porcentaje de tweets con hashtag y de la cantidad promedio por clase, de los hashtags más usados, de su posición en el texto y de las variantes de "inteligencia artificial" por clase. Después, comparación de los cinco caminos (J-40 a J-44) según si conservan la palabra y la presencia y cantidad. El impacto en el desempeño no se midió todavía: se va a validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** tiene hashtag el 24,04% de los positivos, el 14,23% de los neutrales y el 6,51% de los negativos. Entre los tweets con hashtag, el promedio es 2,00, 2,27 y 1,37, y 197 de los 413 tienen dos o más. El 63,68% de los tweets con hashtag tiene alguno dentro de la frase. Se considera que un hashtag está "al final" cuando después solo hay otros hashtags, URLs, espacios o signos de puntuación. El 23,61% de los hashtags junta varias palabras con mayúsculas. "Inteligencia artificial" aparece en 174 hashtags escrita de seis formas, y en todas predomina la clase neutral.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** conserva la palabra, que muchas veces forma parte de la oración, y guarda la presencia y la cantidad, que cambian entre clases. Separar hace que el hashtag termine en las mismas palabras que el texto. Las variantes de "inteligencia artificial" (`ai`, `inteligencia artificial`, `artificial intelligence`, con o sin espacio) no se unifican en `ia`, por dos motivos: la unificación se haría solo en los hashtags y no en el cuerpo del tweet, lo que contradice el argumento de relacionar el hashtag con las palabras del texto, y el concepto es el tema de todo el dataset, por lo que discrimina poco entre clases. `cant_hashtags` también conserva la presencia (`cant_hashtags > 0`) y por eso se prefirió a una columna binaria (J-14).
+
+### J-41 · Mantener los hashtags tal cual (camino A)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #9 / #36
+- **Propuesta:** no tratar los hashtags y dejarlos en el texto.
+- **Cómo se probó:** mismo análisis que J-40 y revisión de las palabras que TF-IDF obtiene de un tweet con hashtags. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** TF-IDF convierte `#IA` en `ia` y `#Tecnología` en `tecnología`.
+- **Decisión:** ❌ Descartada
+- **Justificación:** como TF-IDF no toma el `#` como parte de la palabra, para el modelo este camino es igual a C (J-43). Se descarta por lo mismo: no separa los hashtags compuestos y pierde la presencia y la cantidad de hashtags.
+
+### J-42 · Eliminar los hashtags (camino B)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #9 / #36
+- **Propuesta:** borrar los hashtags del texto sin dejar rastro.
+- **Cómo se probó:** mismo análisis que J-40. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** el 63,68% de los tweets con hashtag tiene alguno dentro de la frase, y la proporción de tweets con hashtag varía casi 18 puntos entre clases.
+- **Decisión:** ❌ Descartada
+- **Justificación:** deja oraciones incompletas y pierde la presencia del hashtag, que se relaciona con la clase.
+
+### J-43 · Sacar solo el `#` (camino C)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #9 / #36
+- **Propuesta:** borrar el `#` y dejar la palabra tal cual, sin columna extra.
+- **Cómo se probó:** mismo análisis que J-40. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** TF-IDF obtiene las mismas palabras que en A: `#IA` y `IA` terminan como `ia`.
+- **Decisión:** ❌ Descartada, equivalente a A con TF-IDF
+- **Justificación:** sacar el `#` a mano solo cambia el texto guardado, no las palabras que ve el modelo, así que tiene los mismos problemas que A (J-41): no separa los hashtags compuestos y pierde la presencia y la cantidad de hashtags, que cambian entre clases.
+
+### J-44 · Reemplazar cada hashtag por un token (camino D)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #9 / #36
+- **Propuesta:** reemplazar cada hashtag por el token `HASHTAGTOKEN`, como se hizo con las URLs.
+- **Cómo se probó:** mismo análisis que J-40. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** el 63,68% de los tweets con hashtag tiene alguno dentro de la frase.
+- **Decisión:** ❌ Descartada
+- **Justificación:** a diferencia del link de una URL, la palabra del hashtag aporta contenido, y el token la pierde. Se podría dejar la palabra junto al token, pero preferimos guardar la señal en una columna, porque queda separada del texto y es más fácil de interpretar.
+
+### J-45 · Reemplazar cada mención por un token (camino C)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #10 / #36
+- **Propuesta:** reemplazar cada mención del texto por el token `USERTOKEN` en `texto_procesado`, para descartar el nombre del usuario y dejar explícita la presencia de la mención.
+- **Cómo se probó:** análisis del porcentaje de tweets con mención por clase y posición, de los usuarios más mencionados, del tamaño del vocabulario y de los tweets vacíos, y comparación de los cinco caminos (J-45 a J-49). Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** el 52,66% de los tweets tiene alguna mención. Tiene mención al inicio el 62,41% de los negativos, el 44,30% de los neutrales y el 35,56% de los positivos. Hay 1244 usuarios distintos y el 57,40% aparece una sola vez. El vocabulario pasa de 13226 palabras con menciones a 11999 con el token, una más que al eliminarlas, y ningún tweet queda vacío.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** lo que puede aportar es la presencia de la mención, no el nombre del usuario. Marca también las menciones del resto del texto, que `menciones_inicio` no cuenta, casi sin costo en el vocabulario. Sigue la misma lógica que `URLTOKEN`. Repite en parte lo que dice `menciones_inicio` y pierde el nombre de la cuenta, como `OpenAI`.
+
+### J-46 · Mantener las menciones tal cual (camino A)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #10 / #36
+- **Propuesta:** no tratar las menciones y dejarlas en el texto.
+- **Cómo se probó:** mismo análisis que J-45 y revisión de las palabras que TF-IDF obtiene de un tweet con menciones. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** TF-IDF convierte `@OpenAI` en `openai`. Los nombres de usuario suman 1228 palabras al vocabulario, un 9,28% del total. `@lareimers` aparece 12 de 19 veces en negativos.
+- **Decisión:** ❌ Descartada
+- **Justificación:** la mayoría de los usuarios aparece muy pocas veces, y el modelo podría memorizar cuentas en lugar de aprender cómo se expresa el sentimiento.
+
+### J-47 · Eliminar las menciones (camino B)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #10 / #36
+- **Propuesta:** borrar las menciones del texto sin dejar rastro.
+- **Cómo se probó:** mismo análisis que J-45. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** 7 tweets quedan vacíos y 231 tweets tienen menciones fuera del inicio, que ninguna columna cuenta. El vocabulario queda en 11998 palabras.
+- **Decisión:** ❌ Descartada
+- **Justificación:** saca los nombres de usuario y `menciones_inicio` conserva la señal del inicio, pero no deja rastro de las demás menciones y ahorra una sola palabra frente a C. Queda como alternativa para comparar en el modelado.
+
+### J-48 · Eliminar las menciones y agregar la feature `tiene_mencion` (camino D)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #10 / #36
+- **Propuesta:** borrar las menciones del texto y guardar su presencia en una columna binaria `tiene_mencion`.
+- **Cómo se probó:** mismo análisis que J-45. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** de los 1467 tweets con mención, 1266 tienen alguna al inicio, una señal que ya guarda `menciones_inicio`.
+- **Decisión:** ❌ Descartada
+- **Justificación:** guarda casi la misma información que `menciones_inicio`, y una feature binaria parecida ya se descartó (J-18).
+
+### J-49 · Eliminar solo las menciones del inicio (camino E)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #10 / #36
+- **Propuesta:** borrar las menciones del inicio del tweet y dejar tal cual las del resto del texto.
+- **Cómo se probó:** mismo análisis que J-45. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** el vocabulario queda en 12309 palabras, 311 más que al eliminarlas todas, y 7 tweets quedan vacíos.
+- **Decisión:** ❌ Descartada
+- **Justificación:** conserva nombres que forman parte de la frase con poco costo, pero necesita dos reglas según la posición y mantiene nombres de usuario poco repetidos. Queda como alternativa para comparar en el modelado.
+
+### J-50 · Pasar cada emoji a palabras (camino D)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #11 / #36
+- **Propuesta:** reemplazar cada emoji por su nombre en español en `texto_procesado`, con las palabras separadas.
+- **Cómo se probó:** análisis del porcentaje de tweets con emoji por clase, de los emojis más usados y su clase, del tamaño del vocabulario y de los tweets sin palabras propias, y comparación de los cinco caminos (J-50 a J-54). Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** el 24,52% de los tweets tiene emojis. 👏 aparece 23 de 28 veces en positivos, 🚀 20 de 27, 🤔 26 de 28 en neutrales y 🤡 13 de 17 en negativos. Hay 354 emojis distintos y el 53,11% aparece una sola vez. El vocabulario pasa de 13226 a 13444 palabras.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** conserva qué emoji se usó, que `cant_emojis` no distingue y se relaciona con la clase. Los emojis parecidos comparten palabras como `cara` o `corazón`, lo que ayuda con los que aparecen poco. A cambio, algunas palabras pueden confundir (😂 pasa a `cara llorando de risa`) y algunos símbolos suman ruido (`5⃣` pasa a `tecla 5`).
+
+### J-51 · Mantener los emojis tal cual (camino A)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #11 / #36
+- **Propuesta:** no tratar los emojis y dejarlos en el texto.
+- **Cómo se probó:** mismo análisis que J-50 y revisión de las palabras que TF-IDF obtiene de un tweet con emojis. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** de `Me encanta la IA 😍`, TF-IDF solo obtiene `encanta`, `ia`, `la` y `me`. El vocabulario es de 13226 palabras con emojis y sin ellos.
+- **Decisión:** ❌ Descartada
+- **Justificación:** TF-IDF no ve los emojis, así que para el modelo es lo mismo que eliminarlos (J-52).
+
+### J-52 · Eliminar los emojis (camino B)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #11 / #36
+- **Propuesta:** borrar los emojis del texto sin dejar rastro.
+- **Cómo se probó:** mismo análisis que J-50. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** 27 tweets se quedan sin palabras propias: pasan de 36 a 63, sin contar URLs ni menciones.
+- **Decisión:** ❌ Descartada
+- **Justificación:** la cantidad queda en `cant_emojis`, pero se pierde qué emoji se usó, que se relaciona con la clase.
+
+### J-53 · Reemplazar cada emoji por un token (camino C)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #11 / #36
+- **Propuesta:** reemplazar cada emoji por el token `EMOJITOKEN`, como se hizo con las URLs y las menciones.
+- **Cómo se probó:** mismo análisis que J-50. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** el vocabulario suma una sola palabra (13227), pero todos los emojis quedan iguales.
+- **Decisión:** ❌ Descartada
+- **Justificación:** solo guarda la presencia, que ya está en `cant_emojis`, y pierde qué emoji se usó.
+
+### J-54 · Un token por emoji (camino E)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #11 / #36
+- **Propuesta:** reemplazar cada emoji por su nombre en español como una sola palabra, por ejemplo `cara_sonriendo_con_ojos_de_corazón`.
+- **Cómo se probó:** mismo análisis que J-50. Queda por validar en el modelado, con el set de validación (J-33) y la métrica que se defina.
+- **Evidencia:** el vocabulario pasa a 13548 palabras, 104 más que D. El 53,11% de los emojis aparece una sola vez.
+- **Decisión:** ❌ Descartada
+- **Justificación:** evita mezclar el emoji con palabras comunes, pero muchos tokens se repetirían muy poco y los emojis parecidos no comparten palabras. Queda como alternativa para comparar en el modelado.
 
 ## 5. Modelado
 
