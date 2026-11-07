@@ -17,6 +17,10 @@ Línea de tiempo de los cambios del proyecto.
 ```
 
 ---
+## 2026-07-11
+- Se tokeniza, se remueve la puntuacion y ciertas stopwords (#37)
+- Se aplica Stemming y Lemming (#37)
+
 ## AAAA-MM-DD
 - Pasa a una división train/test 80/20 con validación cruzada y rehace el análisis sobre el nuevo train (#XX)
 

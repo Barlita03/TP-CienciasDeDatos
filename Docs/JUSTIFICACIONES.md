@@ -529,6 +529,78 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-55
 - **Decisión:** ❌ Descartada
 - **Justificación:** evita mezclar el emoji con palabras comunes, pero muchos tokens se repetirían muy poco y los emojis parecidos no comparten palabras. Queda como alternativa para comparar en el modelado.
 
+### J-56 · Tokenizar por palabras, en minúsculas y sin puntuación, conservando las tildes
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #37 / #XX
+- **Propuesta:** separar `texto_procesado` en palabras con la expresión regular `\w+` después de pasarlo a minúsculas, y guardar el resultado en la columna `tokens`. Quedan las letras (con tilde y ñ) y los números, y la puntuación queda afuera.
+- **Cómo se probó:** cantidad de signos de puntuación en train y cuántos son `!`, `?`, `¡` o `¿`, que ya están en las features; cantidad de tweets con emoticonos de texto (`:)`, `xD`, `<3`) y sus clases; y cantidad de veces que aparece cada versión de palabras que solo se distinguen por la tilde.
+- **Evidencia:** hay 12141 signos en train y los más usados son el punto (4393) y la coma (3373). Solo el 11,03% son `!`, `?`, `¡` o `¿`. 19 tweets (0,60%) tienen emoticonos de texto, sin una clase dominante (14 neutrales, 3 positivos y 2 negativos). `sí` aparece 62 veces y `si` 350; `más` 432 veces y `mas` 36.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** la puntuación casi no aporta: la señal de `!` y `?` ya está en `tiene_exclamacion` y `cant_preguntas` (J-21 y J-24), así que se puede sacar del texto sin perderla. La teoría recomienda no sacar la puntuación en general, pero acá se saca porque lo que informa ya está guardado en columnas. Perder los emoticonos de texto es un costo chico, porque casi no aparecen. Las tildes se conservan porque distinguen palabras (J-58).
+
+### J-57 · Conservar la puntuación en el texto
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #37 / #XX
+- **Propuesta:** no sacar los signos de puntuación y dejarlos en el texto, como recomienda la teoría en general.
+- **Cómo se probó:** mismo análisis de la puntuación que en J-56.
+- **Evidencia:** el 88,97% de los 12141 signos no son `!`, `?`, `¡` ni `¿`, y los más usados son el punto (4393) y la coma (3373).
+- **Decisión:** ❌ Descartada
+- **Justificación:** lo que informa de la puntuación (`!` y `?`) ya está en las features, y el resto son sobre todo puntos y comas. A cambio se resigna lo que esos signos pudieran aportar, que no se midió por clase.
+
+### J-58 · Sacar las tildes
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #37 / #XX
+- **Propuesta:** pasar las palabras a su forma sin tilde, para juntar las variantes que algunos tweets escriben sin ella.
+- **Cómo se probó:** cantidad de veces que aparece cada versión de cuatro pares que solo se distinguen por la tilde: `sí` y `si`, `más` y `mas`, `él` y `el`, `tú` y `tu`.
+- **Evidencia:** `sí` aparece 62 veces y `si` 350; `más` 432 veces y `mas` 36.
+- **Decisión:** ❌ Descartada
+- **Justificación:** sin tildes se juntarían palabras distintas (`sí` y `si`, `él` y `el`, `tú` y `tu`). Los tweets que escriben sin tilde son pocos (`mas` aparece 36 veces contra 432 de `más`), así que lo que se ganaría al juntar variantes es poco.
+
+### J-59 · Tokenizar por caracteres
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #37 / #XX
+- **Propuesta:** usar caracteres (o secuencias de caracteres) como unidad en lugar de palabras.
+- **Cómo se probó:** no se probó en el notebook; se descarta por razonamiento.
+- **Evidencia:** sin evidencia propia por ahora.
+- **Decisión:** ❌ Descartada, como opción principal
+- **Justificación:** el vocabulario sería chico, pero las secuencias son larguísimas y se pierde el significado de las palabras. Queda como alternativa para comparar en el modelado.
+
+### J-60 · Quitar las stopwords de NLTK conservando ocho palabras
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #37 / #XX
+- **Propuesta:** quitar las stopwords de la lista de NLTK para español (313 palabras), salvo `no`, `ni`, `nada`, `sin`, `pero`, `muy`, `más` y `sí`: negaciones, contraste, intensidad y afirmación.
+- **Cómo se probó:** porcentaje de tokens de train que son stopwords y, para cada stopword que aparece en al menos 30 tweets, proporción de cada clase entre los tweets que la usan, comparada con la de todo train. Queda por validar en el modelado, con validación cruzada (J-55) y la métrica que se defina.
+- **Evidencia:** el 42,31% de los tokens de train son stopwords. Palabras como `de`, `la` o `el` tienen una proporción de clases casi igual a la de train. Entre las de más desvío están `ni` (37,1% de negativos, contra 14,9% en train), `nada` (35,3%) y `sin` (29,8%); pronombres como `tu`, `tus` o `nuestro` se inclinan a los positivos.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** las stopwords son casi la mitad del texto y la mayoría no distingue clases, así que quitarlas lo achica sin perder señal. Las que cambian el sentido de la frase o se asocian a una clase se conservan: en sentimiento "me gusta" y "no me gusta" son opuestos. La lista de palabras conservadas se armó a mano a partir de esa tabla y de ese criterio.
+
+### J-61 · Quitar la lista completa de stopwords de NLTK
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #37 / #XX
+- **Propuesta:** quitar las 313 stopwords de la lista de NLTK sin conservar ninguna.
+- **Cómo se probó:** mismo análisis que J-60. Queda por validar en el modelado, con validación cruzada (J-55) y la métrica que se defina.
+- **Evidencia:** la lista incluye `no`, `ni`, `nada`, `sin`, `pero`, `muy`, `más` y `sí`. Entre los tweets que usan `ni`, el 37,1% es negativo, contra 14,9% en train; con `nada` es el 35,3% y con `sin`, el 29,8%.
+- **Decisión:** ❌ Descartada
+- **Justificación:** borra la negación y otras palabras que cambian el sentido: "me gusta" y "no me gusta" quedarían iguales.
+
+### J-62 · Texto con stemming (Snowball)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #37 / #XX
+- **Propuesta:** reducir cada palabra a su raíz con `SnowballStemmer('spanish')`, a partir del texto sin stopwords, en la columna `texto_stem`. Los marcadores `urltoken` y `usertoken` no se modifican. Sirve para juntar las variantes de una misma palabra.
+- **Cómo se probó:** cantidad de palabras distintas del texto sin reducir y del texto con stemming, sin filtro y con `min_df=2` (con `CountVectorizer`), y cómo queda un mismo tweet en cada versión. Queda por validar en el modelado, con validación cruzada (J-55) y la métrica que se defina.
+- **Evidencia:** hay 11778 palabras distintas sin reducir y 6850 con stemming (un 41,8% menos). Con `min_df=2` quedan 4858 sin reducir y 3392 con stemming. En un tweet de ejemplo, `puede` queda como `pued`.
+- **Decisión:** ✅ Aprobada, como candidata (se compara con J-63 y J-64 en el modelado)
+- **Justificación:** es la que más reduce el vocabulario, y con 3184 tweets juntar las variantes hace que cada palabra aparezca más veces. A cambio, la raíz no siempre es una palabra real (`pued`). La decisión final se completa con los resultados del modelado.
+
+### J-63 · Texto con lematización (spaCy)
+- **Etapa:** 4. Preprocesamiento de texto
+- **Issue / PR:** #37 / #XX
+- **Propuesta:** pasar cada palabra a su forma de diccionario con el modelo `es_core_news_sm` de spaCy, a partir del texto sin stopwords, en la columna `texto_lemma`. Se desactivan el parser y el reconocimiento de entidades, se evita que spaCy vuelva a tokenizar, y `urltoken` y `usertoken` no se modifican.
+- **Cómo se probó:** mismo análisis que J-62. Queda por validar en el modelado, con validación cruzada (J-55) y la métrica que se defina.
+- **Evidencia:** la lematización baja las palabras distintas de 11778 a 8867 (un 24,7% menos). Con `min_df=2` quedan 3823. En un tweet de ejemplo, `puede` queda como `poder`.
+- **Decisión:** ✅ Aprobada, como candidata (se compara con J-62 y J-64 en el modelado)
+- **Justificación:** reduce menos el vocabulario que el stemming, pero deja palabras reales (`poder`), más fáciles de leer e interpretar. Una limitación: se aplica sobre el texto sin stopwords (J-60), así que spaCy analiza oraciones incompletas y puede equivocarse más que con la oración entera. La decisión final se completa con los resultados del modelado.
+
 ## 5. Modelado
 
 ## 6. Evaluación
