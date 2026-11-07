@@ -18,6 +18,9 @@ Línea de tiempo de los cambios del proyecto.
 
 ---
 ## AAAA-MM-DD
+- Pasa a una división train/test 80/20 con validación cruzada y rehace el análisis sobre el nuevo train (#XX)
+
+## 2026-11-06
 - Define el tratamiento de URLs en el preprocesamiento de texto (#36)
 - Define el tratamiento de hashtags en el preprocesamiento de texto (#36)
 - Define el tratamiento de menciones en el preprocesamiento de texto (#36)
