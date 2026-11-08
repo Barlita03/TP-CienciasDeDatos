@@ -18,10 +18,18 @@ Línea de tiempo de los cambios del proyecto.
 
 ---
 ## 2026-07-11
+- Se agrega modelo Gaussian Naive Bayes (#12)
+- Se agrega modelo Logistic Regression (#13)
+- Se agrega modelo Decision Tree (#14)
+- Se agrega modelo Random Forest (#15)
+- Se agrega modelo SVM Lineal y RBF (#16)
+- Se agregan los modelos: Soft Voting, Adaptive Boosting, KNN, MultinomialNB, SGD Classifier
+
+## 2026-07-11
 - Se tokeniza, se remueve la puntuacion y ciertas stopwords (#37)
 - Se aplica Stemming y Lemming (#37)
 
-## AAAA-MM-DD
+## 2026-07-11
 - Pasa a una división train/test 80/20 con validación cruzada y rehace el análisis sobre el nuevo train (#XX)
 
 ## 2026-11-06
