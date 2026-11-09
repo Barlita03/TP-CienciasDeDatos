@@ -64,7 +64,7 @@ Todas las propuestas, incluidas las descartadas, tienen que figurar con su códi
 
 ### J-55 · Dividir en train (80%) y test (20%) y ajustar con validación cruzada
 - **Etapa:** 1. Exploración del dataset
-- **Issue / PR:** — / #XX
+- **Issue / PR:** — / #39
 - **Propuesta:** dividir el dataset sin repetidos en train (80%) y test (20%), estratificando por `polarity`, y hacer todo el análisis solo sobre train. En el modelado, comparar modelos y ajustar hiperparámetros con validación cruzada estratificada de 5 partes sobre train (`StratifiedKFold(n_splits=5, shuffle=True, random_state=42)`).
 - **Cómo se probó:** un `train_test_split` con `stratify` y `random_state=42`. Tamaño y proporción de clases de cada set, comparados con la división con un set de validación aparte (J-33).
 - **Evidencia:** quedan 3184 tweets en train y 797 en test, con la misma proporción de clases: P 17,8%, NEU 67,3%-67,4% y N 14,8%-14,9%. Train tiene 474 negativos, contra 59 en el set de validación de J-33.
@@ -531,7 +531,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-55
 
 ### J-56 · Tokenizar por palabras, en minúsculas y sin puntuación, conservando las tildes
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #37 / #XX
+- **Issue / PR:** #37 / #39
 - **Propuesta:** separar `texto_procesado` en palabras con la expresión regular `\w+` después de pasarlo a minúsculas, y guardar el resultado en la columna `tokens`. Quedan las letras (con tilde y ñ) y los números, y la puntuación queda afuera.
 - **Cómo se probó:** cantidad de signos de puntuación en train y cuántos son `!`, `?`, `¡` o `¿`, que ya están en las features; cantidad de tweets con emoticonos de texto (`:)`, `xD`, `<3`) y sus clases; y cantidad de veces que aparece cada versión de palabras que solo se distinguen por la tilde.
 - **Evidencia:** hay 12141 signos en train y los más usados son el punto (4393) y la coma (3373). Solo el 11,03% son `!`, `?`, `¡` o `¿`. 19 tweets (0,60%) tienen emoticonos de texto, sin una clase dominante (14 neutrales, 3 positivos y 2 negativos). `sí` aparece 62 veces y `si` 350; `más` 432 veces y `mas` 36.
@@ -540,7 +540,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-55
 
 ### J-57 · Conservar la puntuación en el texto
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #37 / #XX
+- **Issue / PR:** #37 / #39
 - **Propuesta:** no sacar los signos de puntuación y dejarlos en el texto, como recomienda la teoría en general.
 - **Cómo se probó:** mismo análisis de la puntuación que en J-56.
 - **Evidencia:** el 88,97% de los 12141 signos no son `!`, `?`, `¡` ni `¿`, y los más usados son el punto (4393) y la coma (3373).
@@ -549,7 +549,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-55
 
 ### J-58 · Sacar las tildes
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #37 / #XX
+- **Issue / PR:** #37 / #39
 - **Propuesta:** pasar las palabras a su forma sin tilde, para juntar las variantes que algunos tweets escriben sin ella.
 - **Cómo se probó:** cantidad de veces que aparece cada versión de cuatro pares que solo se distinguen por la tilde: `sí` y `si`, `más` y `mas`, `él` y `el`, `tú` y `tu`.
 - **Evidencia:** `sí` aparece 62 veces y `si` 350; `más` 432 veces y `mas` 36.
@@ -558,7 +558,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-55
 
 ### J-59 · Tokenizar por caracteres
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #37 / #XX
+- **Issue / PR:** #37 / #39
 - **Propuesta:** usar caracteres (o secuencias de caracteres) como unidad en lugar de palabras.
 - **Cómo se probó:** no se probó en el notebook; se descarta por razonamiento.
 - **Evidencia:** sin evidencia propia por ahora.
@@ -567,7 +567,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-55
 
 ### J-60 · Quitar las stopwords de NLTK conservando ocho palabras
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #37 / #XX
+- **Issue / PR:** #37 / #39
 - **Propuesta:** quitar las stopwords de la lista de NLTK para español (313 palabras), salvo `no`, `ni`, `nada`, `sin`, `pero`, `muy`, `más` y `sí`: negaciones, contraste, intensidad y afirmación.
 - **Cómo se probó:** porcentaje de tokens de train que son stopwords y, para cada stopword que aparece en al menos 30 tweets, proporción de cada clase entre los tweets que la usan, comparada con la de todo train. Queda por validar en el modelado, con validación cruzada (J-55) y la métrica que se defina.
 - **Evidencia:** el 42,31% de los tokens de train son stopwords. Palabras como `de`, `la` o `el` tienen una proporción de clases casi igual a la de train. Entre las de más desvío están `ni` (37,1% de negativos, contra 14,9% en train), `nada` (35,3%) y `sin` (29,8%); pronombres como `tu`, `tus` o `nuestro` se inclinan a los positivos.
@@ -576,7 +576,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-55
 
 ### J-61 · Quitar la lista completa de stopwords de NLTK
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #37 / #XX
+- **Issue / PR:** #37 / #39
 - **Propuesta:** quitar las 313 stopwords de la lista de NLTK sin conservar ninguna.
 - **Cómo se probó:** mismo análisis que J-60. Queda por validar en el modelado, con validación cruzada (J-55) y la métrica que se defina.
 - **Evidencia:** la lista incluye `no`, `ni`, `nada`, `sin`, `pero`, `muy`, `más` y `sí`. Entre los tweets que usan `ni`, el 37,1% es negativo, contra 14,9% en train; con `nada` es el 35,3% y con `sin`, el 29,8%.
@@ -585,7 +585,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-55
 
 ### J-62 · Texto con stemming (Snowball)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #37 / #XX
+- **Issue / PR:** #37 / #39
 - **Propuesta:** reducir cada palabra a su raíz con `SnowballStemmer('spanish')`, a partir del texto sin stopwords, en la columna `texto_stem`. Los marcadores `urltoken` y `usertoken` no se modifican. Sirve para juntar las variantes de una misma palabra.
 - **Cómo se probó:** cantidad de palabras distintas del texto sin reducir y del texto con stemming, sin filtro y con `min_df=2` (con `CountVectorizer`), y cómo queda un mismo tweet en cada versión. Queda por validar en el modelado, con validación cruzada (J-55) y la métrica que se defina.
 - **Evidencia:** hay 11778 palabras distintas sin reducir y 6850 con stemming (un 41,8% menos). Con `min_df=2` quedan 4858 sin reducir y 3392 con stemming. En un tweet de ejemplo, `puede` queda como `pued`.
@@ -594,7 +594,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-55
 
 ### J-63 · Texto con lematización (spaCy)
 - **Etapa:** 4. Preprocesamiento de texto
-- **Issue / PR:** #37 / #XX
+- **Issue / PR:** #37 / #39
 - **Propuesta:** pasar cada palabra a su forma de diccionario con el modelo `es_core_news_sm` de spaCy, a partir del texto sin stopwords, en la columna `texto_lemma`. Se desactivan el parser y el reconocimiento de entidades, se evita que spaCy vuelva a tokenizar, y `urltoken` y `usertoken` no se modifican.
 - **Cómo se probó:** mismo análisis que J-62. Queda por validar en el modelado, con validación cruzada (J-55) y la métrica que se defina.
 - **Evidencia:** la lematización baja las palabras distintas de 11778 a 8867 (un 24,7% menos). Con `min_df=2` quedan 3823. En un tweet de ejemplo, `puede` queda como `poder`.
@@ -607,7 +607,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-65 · Modelo ingenuo como referencia
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #XX
+- **Issue / PR:** — / #39
 - **Propuesta:** medir un modelo que siempre predice la clase mayoritaria (`DummyClassifier(strategy='most_frequent')`), para saber desde dónde se parte.
 - **Cómo se probó:** validación cruzada con accuracy, F1 ponderado y F1 macro.
 - **Evidencia:** accuracy 0,673, F1 ponderado 0,542 y F1 macro 0,268.
@@ -616,16 +616,16 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-66 · Regresión logística como modelo base (árbol, regresión logística y Random Forest con el texto base)
 - **Etapa:** 5. Modelado
-- **Issue / PR:** #13, #14, #15 / #XX
+- **Issue / PR:** #13, #14, #15 / #39
 - **Propuesta:** comparar tres modelos de la consigna con `texto_base`, `TfidfVectorizer(min_df=2)` y las 6 features numéricas, para elegir con cuál probar las mejoras.
 - **Cómo se probó:** `GridSearchCV` de cada modelo y `evaluate_model` (matriz de confusión, ROC, precisión-recall y curva de aprendizaje).
-- **Evidencia:** regresión logística 0,587 de F1 CV (`C=10`, `class_weight='balanced'`, 0,979 en train), Random Forest 0,567 (0,967 en train) y árbol 0,450 (0,739 en train).
+- **Evidencia:** regresión logística 0,587 ± 0,026 de F1 CV (`C=10`, `class_weight='balanced'`, 0,981 en train), Random Forest 0,567 ± 0,016 (0,968 en train) y árbol 0,450 ± 0,030 (0,730 en train).
 - **Decisión:** ✅ Aprobada la regresión logística como modelo base
 - **Justificación:** es la de mayor F1 CV y la más simple de las tres. Los tres modelos tienen mucho sobreajuste, y eso se prueba en J-67 a J-69. El árbol y el Random Forest se vuelven a evaluar con el texto elegido (J-81 y J-82).
 
 ### J-67 · Regularizar más la regresión logística
 - **Etapa:** 5. Modelado
-- **Issue / PR:** #17 / #XX
+- **Issue / PR:** #17 / #39
 - **Propuesta:** bajar `C` para reducir la brecha entre train y CV.
 - **Cómo se probó:** curva de validación con `C` entre 0,01 y 100.
 - **Evidencia:** el mejor F1 CV es 0,589 con `C=3` (0,346 de brecha). Con `C=0.1` la brecha baja a 0,082, pero el F1 CV cae a 0,514.
@@ -634,7 +634,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-68 · Achicar el vocabulario de TF-IDF
 - **Etapa:** 5. Modelado
-- **Issue / PR:** #17 / #XX
+- **Issue / PR:** #17 / #39
 - **Propuesta:** usar menos columnas de texto (`min_df=5`, `min_df=10` o `max_features=1000`) para que el modelo tenga menos palabras que memorizar.
 - **Cómo se probó:** regresión logística balanceada con una grilla de `C` para cada vocabulario.
 - **Evidencia:** F1 CV de 0,589 con `min_df=2` (4858 palabras), 0,569 con `min_df=5`, 0,539 con `min_df=10` y 0,563 con `max_features=1000`. La brecha baja de 0,346 a 0,213, 0,098 y 0,182.
@@ -643,7 +643,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-69 · Modelos lineales más simples con el texto base (Naive Bayes multinomial y SVM lineal)
 - **Etapa:** 5. Modelado
-- **Issue / PR:** #16 / #XX
+- **Issue / PR:** #16 / #39
 - **Propuesta:** probar modelos con menos parámetros o con otra función de pérdida, por si sobreajustan menos.
 - **Cómo se probó:** `MultinomialNB` y `LinearSVC(class_weight='balanced')` con grilla, contra la regresión logística con `C=10`.
 - **Evidencia:** Naive Bayes multinomial 0,522 (0,413 de brecha), SVM lineal 0,588 (0,356) y regresión logística 0,587 (0,393).
@@ -652,7 +652,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-70 · Regla de un desvío para elegir el modelo
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #XX
+- **Issue / PR:** — / #39
 - **Propuesta:** en lugar de quedarse con el mayor F1 CV, tomar como umbral el mejor F1 CV menos su desvío entre partes, y entre las variantes que lo superan elegir la de menos columnas. A igual cantidad de columnas se queda la que aparece primero en la tabla, que es la más simple.
 - **Cómo se probó:** se aplica sobre la tabla de las variantes de texto (J-71 a J-76) y otra vez sobre la tabla con todos los modelos (J-77 a J-85).
 - **Evidencia:** el mejor F1 CV es 0,610 ± 0,017 (J-74), así que el umbral es 0,593. Con 5 partes, el desvío entre partes de las variantes va de 0,012 a 0,037, del mismo orden que las diferencias entre ellas.
@@ -661,7 +661,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-71 · Texto con stemming en el modelo
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #XX
+- **Issue / PR:** — / #39
 - **Propuesta:** usar `texto_stem` (J-62) en lugar de `texto_base`, para que cada término aparezca en más tweets.
 - **Cómo se probó:** regresión logística balanceada con grilla de `C`, con `TfidfVectorizer(min_df=2)` y las features numéricas, igual que la base.
 - **Evidencia:** F1 CV de 0,600 ± 0,012 con `C=1`, contra 0,589 ± 0,024 de la base, con 3398 columnas en lugar de 4864. Es la variante con menor desvío y menor brecha (0,832 en train, 0,232 de brecha). La curva de aprendizaje sigue subiendo al final (de 0,486 con 254 tweets a 0,599 con 2547).
@@ -670,7 +670,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-72 · Texto con lematización en el modelo
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #XX
+- **Issue / PR:** — / #39
 - **Propuesta:** usar `texto_lemma` (J-63) en lugar de `texto_base`.
 - **Cómo se probó:** igual que J-71.
 - **Evidencia:** F1 CV de 0,597 ± 0,030 con 3953 columnas.
@@ -679,7 +679,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-73 · TF-IDF con bigramas, `min_df=3`, `max_df=0.9` y `sublinear_tf`
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #XX
+- **Issue / PR:** — / #39
 - **Propuesta:** sumar pares de palabras (`no sirve`, `muy bueno`), descartar los términos muy raros o muy comunes y suavizar las repeticiones dentro de un tweet.
 - **Cómo se probó:** igual que J-71, sobre `texto_stem`.
 - **Evidencia:** F1 CV de 0,595 ± 0,019 con 4080 columnas, contra 0,600 del stemming solo.
@@ -688,7 +688,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-74 · TF-IDF de palabras más secuencias de caracteres
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #XX
+- **Issue / PR:** — / #39
 - **Propuesta:** sumar al TF-IDF de J-73 un TF-IDF de secuencias de 2 a 5 caracteres (`char_wb`, hasta 20000), para juntar variantes y palabras mal escritas o alargadas.
 - **Cómo se probó:** igual que J-71, uniendo las dos matrices con `FeatureUnion`.
 - **Evidencia:** F1 CV de 0,610 ± 0,017, el más alto de la etapa, con 21015 columnas.
@@ -697,7 +697,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-75 · Sacar las features numéricas
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #XX
+- **Issue / PR:** — / #39
 - **Propuesta:** con una representación del texto más rica, probar si las 6 features numéricas siguen aportando.
 - **Cómo se probó:** la variante J-74 solo con el texto.
 - **Evidencia:** el F1 CV baja de 0,610 a 0,597 ± 0,027.
@@ -706,7 +706,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-76 · SVM lineal con el texto de J-74
 - **Etapa:** 5. Modelado
-- **Issue / PR:** #16 / #XX
+- **Issue / PR:** #16 / #39
 - **Propuesta:** cambiar la regresión logística por `LinearSVC(class_weight='balanced')` sobre la mejor representación del texto.
 - **Cómo se probó:** grilla de `C` entre 0,03 y 10.
 - **Evidencia:** F1 CV de 0,599 ± 0,024 con `C=0.1`, contra 0,610 de la regresión logística.
@@ -715,7 +715,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-77 · Naive Bayes gaussiano sobre TF-IDF reducido con SVD
 - **Etapa:** 5. Modelado
-- **Issue / PR:** #12 / #XX
+- **Issue / PR:** #12 / #39
 - **Propuesta:** probar `GaussianNB`, que necesita una matriz densa, reduciendo el TF-IDF con `TruncatedSVD` a 100 o 300 componentes dentro del pipeline.
 - **Cómo se probó:** grilla sobre la cantidad de componentes, con el preprocesamiento de J-71.
 - **Evidencia:** F1 CV de 0,491 ± 0,011 con 300 componentes, con 0,572 en train.
@@ -724,7 +724,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-78 · Naive Bayes complemento
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #XX
+- **Issue / PR:** — / #39
 - **Propuesta:** probar `ComplementNB`, una variante de Naive Bayes multinomial pensada para clases desbalanceadas.
 - **Cómo se probó:** grilla de `alpha`, verificando antes que la matriz no tenga valores negativos (el mínimo es 0).
 - **Evidencia:** F1 CV de 0,590 ± 0,029 con `alpha=0.3` y 0,269 de brecha.
@@ -733,16 +733,16 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-79 · SVM lineal contra SVM con kernel RBF, y cómo escala SVM
 - **Etapa:** 5. Modelado
-- **Issue / PR:** #16, #18 / #XX
+- **Issue / PR:** #16, #18 / #39
 - **Propuesta:** comparar `LinearSVC` con `SVC(kernel='rbf')`, que puede armar fronteras curvas, y medir cuánto tarda cada uno.
 - **Cómo se probó:** grilla de `C` para los dos y de `gamma` (`'scale'` y `'auto'`) para el RBF, con el preprocesamiento de J-71, y el tiempo de un entrenamiento con todo train.
-- **Evidencia:** `LinearSVC` llega a 0,595 ± 0,030 (`C=0.3`) y el RBF a 0,587 ± 0,015 (`C=1`, `gamma='scale'`). Un entrenamiento tarda 0,03 s con `LinearSVC` y 1,77 s con el RBF (cambia según la computadora).
+- **Evidencia:** `LinearSVC` llega a 0,595 ± 0,030 (`C=0.3`) y el RBF a 0,587 ± 0,015 (`C=1`, `gamma='scale'`). Un entrenamiento tarda 0,03 s con `LinearSVC` y 1,63 s con el RBF (cambia según la computadora).
 - **Decisión:** ❌ Descartadas
 - **Justificación:** `LinearSVC` supera el umbral pero usa las mismas columnas que la regresión logística, que va primero en la tabla y es la elegida por J-70. El RBF no mejora al lineal y tarda mucho más: `LinearSVC` solo recorre los valores distintos de 0 de la matriz, así que casi no depende del tamaño del vocabulario, mientras que el kernel compara pares de tweets y su costo crece entre el cuadrado y el cubo de la cantidad de tweets.
 
 ### J-80 · Votación de los tres modelos lineales
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #XX
+- **Issue / PR:** — / #39
 - **Propuesta:** combinar la regresión logística elegida, el `LinearSVC` y el `ComplementNB` con `VotingClassifier(voting='hard')`, cada uno con sus mejores parámetros.
 - **Cómo se probó:** validación cruzada de la combinación, sin grilla.
 - **Evidencia:** F1 CV de 0,607 ± 0,028, contra 0,600 ± 0,012 del elegido.
@@ -751,7 +751,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-81 · Árbol de decisión con el texto elegido
 - **Etapa:** 5. Modelado
-- **Issue / PR:** #14 / #XX
+- **Issue / PR:** #14 / #39
 - **Propuesta:** volver a evaluar el árbol de J-66 con el preprocesamiento elegido.
 - **Cómo se probó:** la misma grilla de `max_depth` y `min_samples_leaf`.
 - **Evidencia:** F1 CV de 0,472 ± 0,024, contra 0,450 con el texto base.
@@ -760,7 +760,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-82 · Random Forest con el texto elegido
 - **Etapa:** 5. Modelado
-- **Issue / PR:** #15 / #XX
+- **Issue / PR:** #15 / #39
 - **Propuesta:** volver a evaluar el Random Forest de J-66 con el preprocesamiento elegido.
 - **Cómo se probó:** la misma grilla de `n_estimators`, `max_depth`, `min_samples_split` y `class_weight`.
 - **Evidencia:** F1 CV de 0,587 ± 0,023, contra 0,567 con el texto base, con 0,975 en train (0,388 de brecha, la más grande).
@@ -769,7 +769,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-83 · SGD
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #XX
+- **Issue / PR:** — / #39
 - **Propuesta:** probar `SGDClassifier(loss='log_loss')`, una regresión logística entrenada con descenso por gradiente estocástico.
 - **Cómo se probó:** grilla de `alpha`, `penalty` (`l2` y `l1`) y `class_weight`, con el preprocesamiento de J-71.
 - **Evidencia:** F1 CV de 0,589 ± 0,037 con `alpha=0.0001`, `penalty='l2'` y `class_weight='balanced'`. Es el mayor desvío entre partes de la tabla.
@@ -778,7 +778,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-84 · KNN
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #XX
+- **Issue / PR:** — / #39
 - **Propuesta:** probar `KNeighborsClassifier` con distancia coseno, que predice la clase más común entre los tweets de train más parecidos.
 - **Cómo se probó:** grilla de `n_neighbors` (3, 5, 7 y 10), con el preprocesamiento de J-71.
 - **Evidencia:** F1 CV de 0,484 ± 0,023 con `n_neighbors=3`.
@@ -787,7 +787,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 
 ### J-85 · AdaBoost
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #XX
+- **Issue / PR:** — / #39
 - **Propuesta:** probar `AdaBoostClassifier`, que encadena árboles de un solo corte y le da más peso a los tweets mal clasificados.
 - **Cómo se probó:** grilla de `n_estimators` (50, 100 y 200) y `learning_rate` (0,1, 0,5 y 1), con el preprocesamiento de J-71.
 - **Evidencia:** F1 CV de 0,379 ± 0,023 con 0,395 en train, con `n_estimators=200` y `learning_rate=1.0`, los dos en el extremo de la grilla.
