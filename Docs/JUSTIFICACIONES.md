@@ -840,3 +840,12 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 - **Evidencia:** F1 macro de 0,580 en test, contra 0,600 ± 0,012 en CV. Precisión y recall de 0,49 y 0,63 en P, 0,82 y 0,65 en NEU, y 0,38 y 0,60 en N. De los 288 errores, solo 22 (7,6%) son entre P y N.
 - **Decisión:** ✅ Aprobada
 - **Justificación:** test no se usó para ninguna decisión, así que su F1 es una estimación honesta, y queda cerca del de CV. El modelo casi no confunde P con N: su dificultad es separar los tweets con opinión de los neutrales, y por `class_weight='balanced'` marca como P o N a muchos neutrales. Los ejemplos muestran errores por falta de contexto (respuestas), ironía y etiquetas discutibles.
+
+### J-91 · Comparar los finalistas en test sin cambiar la elección
+- **Etapa:** 6. Evaluación
+- **Issue / PR:** #21 / —
+- **Propuesta:** resumir la comparación de las 16 variantes en un gráfico de F1 CV ± desvío con el umbral de la regla de un desvío, y evaluar en test, solo como referencia, las dos variantes con mayor F1 CV (J-74 y J-80) junto con el modelo elegido y el ingenuo.
+- **Cómo se probó:** cada finalista se entrena con todo train y sus mejores parámetros de CV, y se compara su F1 macro y su F1 por clase en test.
+- **Evidencia:** F1 macro en test de 0,580 para el elegido (0,600 en CV), 0,613 para palabras + caracteres (0,610 en CV), 0,617 para la votación (0,607 en CV) y 0,268 para el modelo ingenuo. La diferencia está sobre todo en P (0,554 contra 0,595 y 0,583) y NEU (0,723 contra 0,767 y 0,780).
+- **Decisión:** ✅ Aprobada, sin cambiar el modelo elegido
+- **Justificación:** la elección se hizo con validación cruzada antes de mirar test, y elegir ahora por test haría que su F1 dejara de ser una estimación para tweets nuevos. El resultado indica que la regla de un desvío (J-70) pudo resignar algo de desempeño a cambio de simplicidad, y queda como punto a revisar con más datos o con más repeticiones de la validación cruzada.
