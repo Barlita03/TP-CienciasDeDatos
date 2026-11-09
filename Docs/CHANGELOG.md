@@ -18,7 +18,7 @@ Línea de tiempo de los cambios del proyecto.
 
 ---
 ## 2026-11-09
-- Vuelve a correr el notebook después del refactor y completa los números de PR (#XX)
+- Vuelve a correr el notebook después del refactor y completa los números de PR (#40)
 - Pasa a una división train/test 80/20 con validación cruzada y rehace el análisis sobre el nuevo train (#39)
 - Tokeniza, quita la puntuación y las stopwords, y arma el texto con stemming y con lematización (#39)
 - Agrega el modelado: modelo ingenuo, árbol de decisión, regresión logística y Random Forest, pruebas de sobreajuste y de representación del texto, y comparación con Naive Bayes gaussiano y complemento, SVM lineal y RBF, votación, SGD, KNN y AdaBoost (#39)
