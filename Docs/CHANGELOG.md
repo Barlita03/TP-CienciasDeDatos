@@ -17,7 +17,14 @@ Línea de tiempo de los cambios del proyecto.
 ```
 
 ---
-## AAAA-MM-DD
+## 2026-11-08
+- Pasa a una división train/test 80/20 con validación cruzada y rehace el análisis sobre el nuevo train (#XX)
+- Tokeniza, quita la puntuación y las stopwords, y arma el texto con stemming y con lematización (#XX)
+- Agrega el modelado: modelo ingenuo, árbol de decisión, regresión logística y Random Forest, pruebas de sobreajuste y de representación del texto, y comparación con Naive Bayes gaussiano y complemento, SVM lineal y RBF, votación, SGD, KNN y AdaBoost (#XX)
+- Elige la regresión logística con el texto con stemming como modelo final, con la regla de un desvío (#XX)
+- Suma NLTK, spaCy y su modelo en español a la instalación del notebook y a requirements.txt (#XX)
+
+## 2026-11-06
 - Define el tratamiento de URLs en el preprocesamiento de texto (#36)
 - Define el tratamiento de hashtags en el preprocesamiento de texto (#36)
 - Define el tratamiento de menciones en el preprocesamiento de texto (#36)

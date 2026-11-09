@@ -36,16 +36,17 @@ Para cada elemento: decidir si se elimina, se transforma, se construye una featu
 - [x] Hashtags ([#9](https://github.com/Barlita03/TP-CienciasDeDatos/issues/9))
 - [x] Menciones a otros usuarios (@usuario) ([#10](https://github.com/Barlita03/TP-CienciasDeDatos/issues/10))
 - [x] Emojis ([#11](https://github.com/Barlita03/TP-CienciasDeDatos/issues/11))
+- [x] Tecnicas Pre-procesamiento ([#37](https://github.com/Barlita03/TP-CienciasDeDatos/issues/37))
 
 ## 5. Modelado
 
-- [ ] Gaussian Naive Bayes ([#12](https://github.com/Barlita03/TP-CienciasDeDatos/issues/12))
-- [ ] Logistic Regression ([#13](https://github.com/Barlita03/TP-CienciasDeDatos/issues/13))
-- [ ] Decision Tree ([#14](https://github.com/Barlita03/TP-CienciasDeDatos/issues/14))
-- [ ] Random Forest ([#15](https://github.com/Barlita03/TP-CienciasDeDatos/issues/15))
-- [ ] Support Vector Machines ([#16](https://github.com/Barlita03/TP-CienciasDeDatos/issues/16))
-- [ ] Investigar y ajustar los hiperparámetros de cada modelo ([#17](https://github.com/Barlita03/TP-CienciasDeDatos/issues/17))
-- [ ] Analizar cómo escala SVM con la cantidad de features ([#18](https://github.com/Barlita03/TP-CienciasDeDatos/issues/18))
+- [x] Gaussian Naive Bayes ([#12](https://github.com/Barlita03/TP-CienciasDeDatos/issues/12))
+- [x] Logistic Regression ([#13](https://github.com/Barlita03/TP-CienciasDeDatos/issues/13))
+- [x] Decision Tree ([#14](https://github.com/Barlita03/TP-CienciasDeDatos/issues/14))
+- [x] Random Forest ([#15](https://github.com/Barlita03/TP-CienciasDeDatos/issues/15))
+- [x] Support Vector Machines ([#16](https://github.com/Barlita03/TP-CienciasDeDatos/issues/16))
+- [x] Investigar y ajustar los hiperparámetros de cada modelo ([#17](https://github.com/Barlita03/TP-CienciasDeDatos/issues/17))
+- [x] Analizar cómo escala SVM con la cantidad de features ([#18](https://github.com/Barlita03/TP-CienciasDeDatos/issues/18))
 
 ## 6. Evaluación
 
