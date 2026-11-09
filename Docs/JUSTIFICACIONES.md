@@ -795,3 +795,57 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 - **Justificación:** es el peor de la tabla y no llega a aprender ni train. Con 200 árboles de un solo corte usa a lo sumo 200 de las 3398 columnas. Con más árboles podría subir algo, pero queda 22 puntos debajo del elegido.
 
 ## 6. Evaluación
+
+### J-86 · Optimizar el F1 macro
+- **Etapa:** 6. Evaluación
+- **Issue / PR:** #19 / #41
+- **Propuesta:** usar el F1 macro como métrica a optimizar, porque pesa igual las tres clases y en cada una combina precisión y recall.
+- **Cómo se probó:** validación cruzada del modelo ingenuo y del modelo elegido (J-71) con accuracy, balanced accuracy, F1 ponderado y F1 macro, comparando cuánto sube cada métrica de un modelo al otro.
+- **Evidencia:** el F1 macro pasa de 0,268 a 0,600, la mayor diferencia de las cuatro métricas (0,332).
+- **Decisión:** ✅ Aprobada
+- **Justificación:** es la que mejor separa un modelo que aprende de uno que no. P y N son las clases minoritarias, pero son las que dicen cómo se percibe la IA, y con el F1 macro cuentan lo mismo que NEU. Es la métrica que se usó en todo el modelado.
+
+### J-87 · Optimizar la accuracy
+- **Etapa:** 6. Evaluación
+- **Issue / PR:** #19 / #41
+- **Propuesta:** usar la proporción de tweets bien clasificados.
+- **Cómo se probó:** igual que J-86.
+- **Evidencia:** el modelo ingenuo llega a 0,673 y el elegido a 0,666 (0,8 puntos menos).
+- **Decisión:** ❌ Descartada
+- **Justificación:** con dos tercios de los tweets en NEU, predecir siempre NEU da más accuracy que el modelo elegido. Optimizarla favorecería modelos que ignoran P y N.
+
+### J-88 · Optimizar el F1 ponderado
+- **Etapa:** 6. Evaluación
+- **Issue / PR:** #19 / #41
+- **Propuesta:** promediar el F1 de cada clase pesado por su cantidad de tweets.
+- **Cómo se probó:** igual que J-86.
+- **Evidencia:** el modelo ingenuo llega a 0,542 sin acertar ningún P ni N, y el elegido a 0,677 (0,135 más).
+- **Decisión:** ❌ Descartada
+- **Justificación:** NEU pesa dos tercios del promedio, así que la métrica depende sobre todo de esa clase y achica la mejora en P y N.
+
+### J-89 · Optimizar la balanced accuracy
+- **Etapa:** 6. Evaluación
+- **Issue / PR:** #19 / #41
+- **Propuesta:** promediar el recall de las tres clases, que también pesa igual cada clase.
+- **Cómo se probó:** igual que J-86.
+- **Evidencia:** pasa de 0,333 en el modelo ingenuo a 0,636 en el elegido (0,302 más).
+- **Decisión:** ❌ Descartada
+- **Justificación:** solo mira el recall, así que no castiga los tweets que el modelo marca como P o N sin serlo. Para etiquetar tweets nuevos esos errores inflarían la cantidad de opiniones positivas o negativas. El F1 macro tiene en cuenta los dos tipos de error.
+
+### J-90 · Evaluar en test una sola vez, con el modelo elegido entrenado con todo train
+- **Etapa:** 6. Evaluación
+- **Issue / PR:** #20 / #41
+- **Propuesta:** entrenar el modelo elegido (J-71) con todo train y evaluarlo en test una sola vez, con `classification_report`, matriz de confusión y ejemplos de tweets mal clasificados, para estimar cómo andaría con tweets nuevos.
+- **Cómo se probó:** F1 macro en test contra el de validación cruzada, métricas por clase, conteo de errores entre P y N, y dos ejemplos al azar por cada combinación de clase real y predicha.
+- **Evidencia:** F1 macro de 0,580 en test, contra 0,600 ± 0,012 en CV. Precisión y recall de 0,49 y 0,63 en P, 0,82 y 0,65 en NEU, y 0,38 y 0,60 en N. De los 288 errores, solo 22 (7,6%) son entre P y N.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** test no se usó para ninguna decisión, así que su F1 es una estimación honesta, y queda cerca del de CV. El modelo casi no confunde P con N: su dificultad es separar los tweets con opinión de los neutrales, y por `class_weight='balanced'` marca como P o N a muchos neutrales. Los ejemplos muestran errores por falta de contexto (respuestas), ironía y etiquetas discutibles.
+
+### J-91 · Comparar los finalistas en test sin cambiar la elección
+- **Etapa:** 6. Evaluación
+- **Issue / PR:** #21 / #41
+- **Propuesta:** resumir la comparación de las 16 variantes en un gráfico de F1 CV ± desvío con el umbral de la regla de un desvío, y evaluar en test, solo como referencia, las dos variantes con mayor F1 CV (J-74 y J-80) junto con el modelo elegido y el ingenuo.
+- **Cómo se probó:** cada finalista se entrena con todo train y sus mejores parámetros de CV, y se compara su F1 macro y su F1 por clase en test.
+- **Evidencia:** F1 macro en test de 0,580 para el elegido (0,600 en CV), 0,613 para palabras + caracteres (0,610 en CV), 0,617 para la votación (0,607 en CV) y 0,268 para el modelo ingenuo. La diferencia está sobre todo en P (0,554 contra 0,595 y 0,583) y NEU (0,723 contra 0,767 y 0,780).
+- **Decisión:** ✅ Aprobada, sin cambiar el modelo elegido
+- **Justificación:** la elección se hizo con validación cruzada antes de mirar test, y elegir ahora por test haría que su F1 dejara de ser una estimación para tweets nuevos. El resultado indica que la regla de un desvío (J-70) pudo resignar algo de desempeño a cambio de simplicidad, y queda como punto a revisar con más datos o con más repeticiones de la validación cruzada.
