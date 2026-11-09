@@ -56,7 +56,7 @@ Para cada elemento: decidir si se elimina, se transforma, se construye una featu
 
 ## 7. Conclusiones
 
-- [ ] Redactar las conclusiones en el notebook ([#22](https://github.com/Barlita03/TP-CienciasDeDatos/issues/22))
+- [x] Redactar las conclusiones en el notebook ([#22](https://github.com/Barlita03/TP-CienciasDeDatos/issues/22))
 
 ## 8. Uso de IA
 
