@@ -50,9 +50,9 @@ Para cada elemento: decidir si se elimina, se transforma, se construye una featu
 
 ## 6. Evaluación
 
-- [ ] Definir la métrica a optimizar (clasificación multiclase) ([#19](https://github.com/Barlita03/TP-CienciasDeDatos/issues/19))
-- [ ] Analizar los resultados de los modelos ([#20](https://github.com/Barlita03/TP-CienciasDeDatos/issues/20))
-- [ ] Comparar el desempeño entre modelos ([#21](https://github.com/Barlita03/TP-CienciasDeDatos/issues/21))
+- [x] Definir la métrica a optimizar (clasificación multiclase) ([#19](https://github.com/Barlita03/TP-CienciasDeDatos/issues/19))
+- [x] Analizar los resultados de los modelos ([#20](https://github.com/Barlita03/TP-CienciasDeDatos/issues/20))
+- [x] Comparar el desempeño entre modelos ([#21](https://github.com/Barlita03/TP-CienciasDeDatos/issues/21))
 
 ## 7. Conclusiones
 
