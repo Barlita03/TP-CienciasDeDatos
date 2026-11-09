@@ -831,3 +831,12 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 - **Evidencia:** pasa de 0,333 en el modelo ingenuo a 0,636 en el elegido (0,302 más).
 - **Decisión:** ❌ Descartada
 - **Justificación:** solo mira el recall, así que no castiga los tweets que el modelo marca como P o N sin serlo. Para etiquetar tweets nuevos esos errores inflarían la cantidad de opiniones positivas o negativas. El F1 macro tiene en cuenta los dos tipos de error.
+
+### J-90 · Evaluar en test una sola vez, con el modelo elegido entrenado con todo train
+- **Etapa:** 6. Evaluación
+- **Issue / PR:** #20 / —
+- **Propuesta:** entrenar el modelo elegido (J-71) con todo train y evaluarlo en test una sola vez, con `classification_report`, matriz de confusión y ejemplos de tweets mal clasificados, para estimar cómo andaría con tweets nuevos.
+- **Cómo se probó:** F1 macro en test contra el de validación cruzada, métricas por clase, conteo de errores entre P y N, y dos ejemplos al azar por cada combinación de clase real y predicha.
+- **Evidencia:** F1 macro de 0,580 en test, contra 0,600 ± 0,012 en CV. Precisión y recall de 0,49 y 0,63 en P, 0,82 y 0,65 en NEU, y 0,38 y 0,60 en N. De los 288 errores, solo 22 (7,6%) son entre P y N.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** test no se usó para ninguna decisión, así que su F1 es una estimación honesta, y queda cerca del de CV. El modelo casi no confunde P con N: su dificultad es separar los tweets con opinión de los neutrales, y por `class_weight='balanced'` marca como P o N a muchos neutrales. Los ejemplos muestran errores por falta de contexto (respuestas), ironía y etiquetas discutibles.
