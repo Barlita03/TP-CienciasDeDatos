@@ -795,3 +795,39 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 - **Justificación:** es el peor de la tabla y no llega a aprender ni train. Con 200 árboles de un solo corte usa a lo sumo 200 de las 3398 columnas. Con más árboles podría subir algo, pero queda 22 puntos debajo del elegido.
 
 ## 6. Evaluación
+
+### J-86 · Optimizar el F1 macro
+- **Etapa:** 6. Evaluación
+- **Issue / PR:** #19 / —
+- **Propuesta:** usar el F1 macro como métrica a optimizar, porque pesa igual las tres clases y en cada una combina precisión y recall.
+- **Cómo se probó:** validación cruzada del modelo ingenuo y del modelo elegido (J-71) con accuracy, balanced accuracy, F1 ponderado y F1 macro, comparando cuánto sube cada métrica de un modelo al otro.
+- **Evidencia:** el F1 macro pasa de 0,268 a 0,600, la mayor diferencia de las cuatro métricas (0,332).
+- **Decisión:** ✅ Aprobada
+- **Justificación:** es la que mejor separa un modelo que aprende de uno que no. P y N son las clases minoritarias, pero son las que dicen cómo se percibe la IA, y con el F1 macro cuentan lo mismo que NEU. Es la métrica que se usó en todo el modelado.
+
+### J-87 · Optimizar la accuracy
+- **Etapa:** 6. Evaluación
+- **Issue / PR:** #19 / —
+- **Propuesta:** usar la proporción de tweets bien clasificados.
+- **Cómo se probó:** igual que J-86.
+- **Evidencia:** el modelo ingenuo llega a 0,673 y el elegido a 0,666 (0,8 puntos menos).
+- **Decisión:** ❌ Descartada
+- **Justificación:** con dos tercios de los tweets en NEU, predecir siempre NEU da más accuracy que el modelo elegido. Optimizarla favorecería modelos que ignoran P y N.
+
+### J-88 · Optimizar el F1 ponderado
+- **Etapa:** 6. Evaluación
+- **Issue / PR:** #19 / —
+- **Propuesta:** promediar el F1 de cada clase pesado por su cantidad de tweets.
+- **Cómo se probó:** igual que J-86.
+- **Evidencia:** el modelo ingenuo llega a 0,542 sin acertar ningún P ni N, y el elegido a 0,677 (0,135 más).
+- **Decisión:** ❌ Descartada
+- **Justificación:** NEU pesa dos tercios del promedio, así que la métrica depende sobre todo de esa clase y achica la mejora en P y N.
+
+### J-89 · Optimizar la balanced accuracy
+- **Etapa:** 6. Evaluación
+- **Issue / PR:** #19 / —
+- **Propuesta:** promediar el recall de las tres clases, que también pesa igual cada clase.
+- **Cómo se probó:** igual que J-86.
+- **Evidencia:** pasa de 0,333 en el modelo ingenuo a 0,636 en el elegido (0,302 más).
+- **Decisión:** ❌ Descartada
+- **Justificación:** solo mira el recall, así que no castiga los tweets que el modelo marca como P o N sin serlo. Para etiquetar tweets nuevos esos errores inflarían la cantidad de opiniones positivas o negativas. El F1 macro tiene en cuenta los dos tipos de error.
