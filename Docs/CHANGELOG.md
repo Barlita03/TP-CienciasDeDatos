@@ -18,6 +18,7 @@ Línea de tiempo de los cambios del proyecto.
 
 ---
 ## 2026-11-09
+- Cita en el código de qué notebook, diapositiva de clase o parte de la consigna sale cada técnica, y pasa a la forma de las clases la matriz de correlación de las features y la diagonal de la curva ROC, sin cambiar ningún resultado (#44)
 - Agrega las conclusiones del trabajo y las mejoras a futuro (#42)
 - Define el F1 macro como métrica a optimizar y descarta accuracy, F1 ponderado y balanced accuracy (#41)
 - Evalúa el modelo elegido en test: métricas por clase, matrices de confusión y ejemplos de tweets mal clasificados (#41)
