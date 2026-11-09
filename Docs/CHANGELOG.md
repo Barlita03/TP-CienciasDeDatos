@@ -17,20 +17,12 @@ Línea de tiempo de los cambios del proyecto.
 ```
 
 ---
-## 2026-07-11
-- Se agrega modelo Gaussian Naive Bayes (#12)
-- Se agrega modelo Logistic Regression (#13)
-- Se agrega modelo Decision Tree (#14)
-- Se agrega modelo Random Forest (#15)
-- Se agrega modelo SVM Lineal y RBF (#16)
-- Se agregan los modelos: Soft Voting, Adaptive Boosting, KNN, MultinomialNB, SGD Classifier
-
-## 2026-07-11
-- Se tokeniza, se remueve la puntuacion y ciertas stopwords (#37)
-- Se aplica Stemming y Lemming (#37)
-
-## 2026-07-11
+## 2026-11-08
 - Pasa a una división train/test 80/20 con validación cruzada y rehace el análisis sobre el nuevo train (#XX)
+- Tokeniza, quita la puntuación y las stopwords, y arma el texto con stemming y con lematización (#XX)
+- Agrega el modelado: modelo ingenuo, árbol de decisión, regresión logística y Random Forest, pruebas de sobreajuste y de representación del texto, y comparación con Naive Bayes gaussiano y complemento, SVM lineal y RBF, votación, SGD, KNN y AdaBoost (#XX)
+- Elige la regresión logística con el texto con stemming como modelo final, con la regla de un desvío (#XX)
+- Suma NLTK, spaCy y su modelo en español a la instalación del notebook y a requirements.txt (#XX)
 
 ## 2026-11-06
 - Define el tratamiento de URLs en el preprocesamiento de texto (#36)

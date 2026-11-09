@@ -6,6 +6,7 @@ contourpy==1.4.0
 cycler==0.12.1
 debugpy==1.8.22
 emoji==2.16.0
+es_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.8.0/es_core_news_sm-3.8.0-py3-none-any.whl
 executing==2.3.0
 fonttools==4.67.0
 ipykernel==7.4.0
@@ -20,6 +21,7 @@ matplotlib==3.11.2
 matplotlib-inline==0.2.2
 narwhals==2.27.1
 nest-asyncio2==1.7.4
+nltk==3.10.4
 numpy==2.5.4
 packaging==26.3
 pandas==3.0.6
@@ -37,6 +39,7 @@ scikit-learn==1.9.1
 scipy==1.18.1
 seaborn==0.13.2
 six==1.17.0
+spacy==3.8.18
 stack-data==0.6.3
 threadpoolctl==3.7.0
 tornado==6.5.10
