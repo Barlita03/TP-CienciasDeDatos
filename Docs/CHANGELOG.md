@@ -18,7 +18,7 @@ Línea de tiempo de los cambios del proyecto.
 
 ---
 ## 2026-11-09
-- Agrega las conclusiones del trabajo y las mejoras a futuro (#XX)
+- Agrega las conclusiones del trabajo y las mejoras a futuro (#42)
 - Define el F1 macro como métrica a optimizar y descarta accuracy, F1 ponderado y balanced accuracy (#41)
 - Evalúa el modelo elegido en test: métricas por clase, matrices de confusión y ejemplos de tweets mal clasificados (#41)
 - Compara todos los modelos en un gráfico de F1 CV y evalúa en test a los finalistas como referencia, sin cambiar la elección (#41)
