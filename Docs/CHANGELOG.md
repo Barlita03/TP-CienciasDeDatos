@@ -18,6 +18,11 @@ Línea de tiempo de los cambios del proyecto.
 
 ---
 ## 2026-11-09
+- Agrega embeddings de oraciones como representación del texto y los elige con la regla de un desvío (#)
+- Ajusta la regla de un desvío: los embeddings cuentan como la variante más compleja y, a igual cantidad de columnas, se prefiere un modelo lineal (#)
+- Vuelve a evaluar los clasificadores 8 a 17 sobre embeddings y elige SGD como modelo final; ComplementNB queda como no aplicable y la votación usa GaussianNB (#)
+- Actualiza la evaluación en test y las conclusiones con el modelo final (#)
+- Suma sentence-transformers y torch a requirements.txt (#)
 - Cita en el código de qué notebook, diapositiva de clase o parte de la consigna sale cada técnica, y pasa a la forma de las clases la matriz de correlación de las features y la diagonal de la curva ROC, sin cambiar ningún resultado (#44)
 - Agrega las conclusiones del trabajo y las mejoras a futuro (#42)
 - Define el F1 macro como métrica a optimizar y descarta accuracy, F1 ponderado y balanced accuracy (#41)

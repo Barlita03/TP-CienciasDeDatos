@@ -657,7 +657,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 - **Cómo se probó:** se aplica sobre la tabla de las variantes de texto (J-71 a J-76) y otra vez sobre la tabla con todos los modelos (J-77 a J-85).
 - **Evidencia:** el mejor F1 CV es 0,610 ± 0,017 (J-74), así que el umbral es 0,593. Con 5 partes, el desvío entre partes de las variantes va de 0,012 a 0,037, del mismo orden que las diferencias entre ellas.
 - **Decisión:** ✅ Aprobada
-- **Justificación:** diferencias de F1 CV menores que el desvío entre partes pueden ser ruido de la partición. Entre modelos que no se pueden distinguir, conviene el más simple, que además es más fácil de explicar.
+- **Justificación:** diferencias de F1 CV menores que el desvío entre partes pueden ser ruido de la partición. Entre modelos que no se pueden distinguir, conviene el más simple, que además es más fácil de explicar. Se modificó en J-93.
 
 ### J-71 · Texto con stemming en el modelo
 - **Etapa:** 5. Modelado
@@ -665,8 +665,8 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 - **Propuesta:** usar `texto_stem` (J-62) en lugar de `texto_base`, para que cada término aparezca en más tweets.
 - **Cómo se probó:** regresión logística balanceada con grilla de `C`, con `TfidfVectorizer(min_df=2)` y las features numéricas, igual que la base.
 - **Evidencia:** F1 CV de 0,600 ± 0,012 con `C=1`, contra 0,589 ± 0,024 de la base, con 3398 columnas en lugar de 4864. Es la variante con menor desvío y menor brecha (0,832 en train, 0,232 de brecha). La curva de aprendizaje sigue subiendo al final (de 0,486 con 254 tweets a 0,599 con 2547).
-- **Decisión:** ✅ Aprobada, como modelo final
-- **Justificación:** supera el umbral de J-70 y es la de menos columnas, así que es la elegida. Sigue habiendo sobreajuste, y la curva de aprendizaje indica que más tweets etiquetados probablemente lo mejorarían.
+- **Decisión:** ✅ Aprobada entre las variantes de TF-IDF; como modelo final la reemplaza J-92
+- **Justificación:** supera el umbral de J-70 y es la de menos columnas, así que es la elegida entre las variantes de TF-IDF. Sigue habiendo sobreajuste, y la curva de aprendizaje indica que más tweets etiquetados probablemente lo mejorarían.
 
 ### J-72 · Texto con lematización en el modelo
 - **Etapa:** 5. Modelado
@@ -693,7 +693,7 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 - **Cómo se probó:** igual que J-71, uniendo las dos matrices con `FeatureUnion`.
 - **Evidencia:** F1 CV de 0,610 ± 0,017, el más alto de la etapa, con 21015 columnas.
 - **Decisión:** ❌ Descartada
-- **Justificación:** queda 1 punto arriba del stemming, menos que el desvío entre partes, con unas 6 veces más columnas. Por la regla de J-70 se elige el stemming.
+- **Justificación:** queda 1 punto arriba del stemming, menos que el desvío entre partes, con unas 6 veces más columnas. Por la regla de J-70 se elige el stemming. Con los embeddings (J-92), queda debajo del umbral (0,6101 contra 0,6117).
 
 ### J-75 · Sacar las features numéricas
 - **Etapa:** 5. Modelado
@@ -713,139 +713,143 @@ Todas las pruebas de esta etapa se comparan con el F1 macro, con la misma valida
 - **Decisión:** ❌ Descartada
 - **Justificación:** con las mismas features no mejora a la regresión logística.
 
-### J-77 · Naive Bayes gaussiano sobre TF-IDF reducido con SVD
+### J-92 · Embeddings de oraciones como representación del texto
 - **Etapa:** 5. Modelado
-- **Issue / PR:** #12 / #39
-- **Propuesta:** probar `GaussianNB`, que necesita una matriz densa, reduciendo el TF-IDF con `TruncatedSVD` a 100 o 300 componentes dentro del pipeline.
-- **Cómo se probó:** grilla sobre la cantidad de componentes, con el preprocesamiento de J-71.
-- **Evidencia:** F1 CV de 0,491 ± 0,011 con 300 componentes, con 0,572 en train.
-- **Decisión:** ❌ Descartada
-- **Justificación:** queda 11 puntos debajo del elegido. El TF-IDF no tiene forma de normal y la reducción diluye las palabras poco frecuentes que distinguen sentimientos.
+- **Issue / PR:** #46 / pendiente
+- **Propuesta:** representar cada tweet con embeddings de oraciones (Clase 7, diapositivas 14 a 20, y "Estrategia B" del notebook de la Clase 7). Se usa el `EmbeddingTransformer` de la clase con el modelo `paraphrase-multilingual-MiniLM-L12-v2`, que incluye el español y da 384 dimensiones con *mean pooling*, sobre `texto_procesado` sin `URLTOKEN` ni `USERTOKEN`.
+- **Cómo se probó:** igual que J-71: regresión logística balanceada con grilla de `C` y las features numéricas. Cada vector se calcula una sola vez y se guarda para reutilizarlo en cada parte de la validación cruzada.
+- **Evidencia:** F1 CV de 0,629 ± 0,018 con `C=0.3`, con 0,707 en train (0,078 de brecha) y 390 columnas. Sin redondear, el umbral de la regla es 0,6117 y la prueba 4 (J-74) queda en 0,6101. Los vectores de train se calculan en unos 61 s.
+- **Decisión:** ✅ Aprobada, como representación del texto
+- **Justificación:** es la única variante que supera el umbral, así que se elige aunque se la cuente como la más compleja (J-93), aunque por un margen chico. Tiene la menor brecha de la etapa, porque el modelo ya viene entrenado con una gran cantidad de textos y el clasificador no necesita aprender el significado de cada palabra a partir de 3184 tweets. Se usa un modelo multilingüe porque el de la clase (`all-MiniLM-L6-v2`) es para inglés. No se usa `texto_stem` porque el stemming deja palabras que no existen (Clase 7, diapositiva 10), que el modelo no reconoce, y tampoco se sacan las stopwords, que le dan contexto a la oración. Guardar los vectores no filtra información entre partes, porque el modelo no aprende de nuestros datos y cada vector depende solo de su tweet.
 
+### J-93 · Cambios a la regla de un desvío
+- **Etapa:** 5. Modelado
+- **Issue / PR:** #46 / pendiente
+- **Propuesta:** dos cambios a J-70. Los embeddings cuentan como la variante más compleja, aunque tengan menos columnas, y solo se eligen si son la única variante que supera el umbral. A igual cantidad de columnas se prefiere un modelo lineal (regresión logística, SGD o SVM lineal) sobre los de kernel, vecinos, árboles o ensambles, y si el empate se mantiene, el que aparece primero en la tabla.
+- **Cómo se probó:** se aplica sobre la tabla de "Representación del texto" y sobre la tabla completa.
+- **Evidencia:** los embeddings usan 390 columnas, contra 3398 a 21015 de las variantes de TF-IDF: con la regla original se los elegiría por ser los más simples. En la tabla completa superan el umbral (0,654) el SVC RBF (0,672) y SGD (0,660), los dos con 390 columnas, y el desempate original elegía el SVC por aparecer primero.
+- **Decisión:** ✅ Aprobada
+- **Justificación:** la cantidad de columnas no mide la complejidad de un modelo ya entrenado ni la del clasificador. Los embeddings dependen de una red neuronal y no permiten ver qué palabras pesan, así que solo se justifican si mejoran por más de un desvío. Entre dos modelos que no se pueden distinguir, conviene el lineal, que es más fácil de explicar y, en este caso, sobreajusta mucho menos (0,039 de brecha contra 0,269).
+
+### J-77 · Naive Bayes gaussiano sobre el texto reducido con SVD
+- **Etapa:** 5. Modelado
+- **Issue / PR:** #12, #46 / #39
+- **Propuesta:** probar `GaussianNB`, que supone columnas con distribución normal e independientes, reduciendo el texto con `TruncatedSVD` a 100 o 300 componentes dentro del pipeline.
+- **Cómo se probó:** grilla sobre la cantidad de componentes, con el preprocesamiento elegido (J-92).
+- **Evidencia:** F1 CV de 0,617 ± 0,020 con 100 componentes, con 0,661 en train (con TF-IDF había dado 0,491 ± 0,011).
+- **Decisión:** ❌ Descartada
+- **Justificación:** queda debajo del umbral de la tabla completa (0,654). Mejora mucho respecto de TF-IDF: los embeddings son valores continuos repartidos en todas las dimensiones, más cerca del supuesto de normalidad, y las componentes de la SVD no están correlacionadas entre sí.
 ### J-78 · Naive Bayes complemento
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #39
+- **Issue / PR:** #46 / #39
 - **Propuesta:** probar `ComplementNB`, una variante de Naive Bayes multinomial pensada para clases desbalanceadas.
-- **Cómo se probó:** grilla de `alpha`, verificando antes que la matriz no tenga valores negativos (el mínimo es 0).
-- **Evidencia:** F1 CV de 0,590 ± 0,029 con `alpha=0.3` y 0,269 de brecha.
-- **Decisión:** ❌ Descartada
-- **Justificación:** queda apenas debajo del umbral de J-70 (0,593).
-
+- **Cómo se probó:** se verifica antes que la matriz no tenga valores negativos y, si no los tiene, se hace una grilla de `alpha`.
+- **Evidencia:** con embeddings, la matriz tiene un mínimo de −1,432 y `ComplementNB` no la acepta (con TF-IDF, donde el mínimo es 0, había dado 0,590 ± 0,029).
+- **Decisión:** ❌ No aplicable con embeddings
+- **Justificación:** modela frecuencias de palabras, así que solo admite valores no negativos, y los embeddings no lo son.
 ### J-79 · SVM lineal contra SVM con kernel RBF, y cómo escala SVM
 - **Etapa:** 5. Modelado
-- **Issue / PR:** #16, #18 / #39
+- **Issue / PR:** #16, #18, #46 / #39
 - **Propuesta:** comparar `LinearSVC` con `SVC(kernel='rbf')`, que puede armar fronteras curvas, y medir cuánto tarda cada uno.
-- **Cómo se probó:** grilla de `C` para los dos y de `gamma` (`'scale'` y `'auto'`) para el RBF, con el preprocesamiento de J-71, y el tiempo de un entrenamiento con todo train.
-- **Evidencia:** `LinearSVC` llega a 0,595 ± 0,030 (`C=0.3`) y el RBF a 0,587 ± 0,015 (`C=1`, `gamma='scale'`). Un entrenamiento tarda 0,03 s con `LinearSVC` y 1,63 s con el RBF (cambia según la computadora).
+- **Cómo se probó:** grilla de `C` para los dos y de `gamma` (`'scale'` y `'auto'`) para el RBF, con el preprocesamiento elegido (J-92), y el tiempo de un entrenamiento con todo train.
+- **Evidencia:** `LinearSVC` llega a 0,654 ± 0,030 (`C=0.03`) y el RBF a 0,672 ± 0,018 (`C=3`, `gamma='scale'`), con 0,941 en train (con TF-IDF habían dado 0,595 y 0,587). Un entrenamiento tarda 0,75 s con `LinearSVC` y 1,82 s con el RBF (cambia según la computadora).
 - **Decisión:** ❌ Descartadas
-- **Justificación:** `LinearSVC` supera el umbral pero usa las mismas columnas que la regresión logística, que va primero en la tabla y es la elegida por J-70. El RBF no mejora al lineal y tarda mucho más: `LinearSVC` solo recorre los valores distintos de 0 de la matriz, así que casi no depende del tamaño del vocabulario, mientras que el kernel compara pares de tweets y su costo crece entre el cuadrado y el cubo de la cantidad de tweets.
-
-### J-80 · Votación de los tres modelos lineales
+- **Justificación:** `LinearSVC` queda justo en el umbral, sin superarlo. El RBF tiene el mayor F1 CV, pero no se distingue de SGD por más de un desvío, pierde el desempate de J-93 y sobreajusta mucho más (0,269 de brecha). `LinearSVC` recorre los valores distintos de 0 de cada tweet, así que su costo crece con la cantidad de tweets y de valores distintos de 0 por tweet: con TF-IDF son unas pocas palabras, y con embeddings, los 390 valores. El kernel compara pares de tweets, y su costo crece entre el cuadrado y el cubo de la cantidad de tweets. Con embeddings el RBF mejora al lineal porque en ese espacio la distancia entre tweets refleja su significado.
+### J-80 · Votación de tres modelos
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #39
-- **Propuesta:** combinar la regresión logística elegida, el `LinearSVC` y el `ComplementNB` con `VotingClassifier(voting='hard')`, cada uno con sus mejores parámetros.
+- **Issue / PR:** #46 / #39
+- **Propuesta:** combinar la regresión logística elegida, el `LinearSVC` y un Naive Bayes con `VotingClassifier(voting='hard')`, cada uno con sus mejores parámetros. El Naive Bayes es `ComplementNB` si se puede usar y, si no, `GaussianNB` con la SVD de J-77.
 - **Cómo se probó:** validación cruzada de la combinación, sin grilla.
-- **Evidencia:** F1 CV de 0,607 ± 0,028, contra 0,600 ± 0,012 del elegido.
+- **Evidencia:** F1 CV de 0,651 ± 0,025, con `GaussianNB` porque con embeddings `ComplementNB` no se puede usar (J-78). Con TF-IDF había dado 0,607 ± 0,028.
 - **Decisión:** ❌ Descartada
-- **Justificación:** sube 0,7 puntos, mucho menos que el desvío entre partes, y entrena tres modelos en lugar de uno.
-
+- **Justificación:** queda debajo del umbral y del `LinearSVC` solo (0,654), y entrena tres modelos en lugar de uno.
 ### J-81 · Árbol de decisión con el texto elegido
 - **Etapa:** 5. Modelado
-- **Issue / PR:** #14 / #39
+- **Issue / PR:** #14, #46 / #39
 - **Propuesta:** volver a evaluar el árbol de J-66 con el preprocesamiento elegido.
 - **Cómo se probó:** la misma grilla de `max_depth` y `min_samples_leaf`.
-- **Evidencia:** F1 CV de 0,472 ± 0,024, contra 0,450 con el texto base.
+- **Evidencia:** F1 CV de 0,510 ± 0,019 con `max_depth=5` (con TF-IDF había dado 0,472 ± 0,024, y 0,450 con el texto base).
 - **Decisión:** ❌ Descartada
-- **Justificación:** queda 13 puntos debajo del elegido. Cada corte usa una sola columna, y con miles de palabras que aparecen en pocos tweets le cuesta encontrar cortes que sirvan.
-
+- **Justificación:** es el peor de la tabla. Cada corte usa una sola columna, y en los embeddings la información está repartida entre las 384 dimensiones.
 ### J-82 · Random Forest con el texto elegido
 - **Etapa:** 5. Modelado
-- **Issue / PR:** #15 / #39
+- **Issue / PR:** #15, #46 / #39
 - **Propuesta:** volver a evaluar el Random Forest de J-66 con el preprocesamiento elegido.
 - **Cómo se probó:** la misma grilla de `n_estimators`, `max_depth`, `min_samples_split` y `class_weight`.
-- **Evidencia:** F1 CV de 0,587 ± 0,023, contra 0,567 con el texto base, con 0,975 en train (0,388 de brecha, la más grande).
+- **Evidencia:** F1 CV de 0,645 ± 0,010, con 0,965 en train (0,320 de brecha, la mayor de los modelos nuevos). Con TF-IDF había dado 0,587 ± 0,023, y 0,567 con el texto base.
 - **Decisión:** ❌ Descartada
-- **Justificación:** queda apenas debajo del umbral y es el que más sobreajusta.
-
+- **Justificación:** queda debajo del umbral y es el que más sobreajusta.
 ### J-83 · SGD
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #39
+- **Issue / PR:** #46 / #39
 - **Propuesta:** probar `SGDClassifier(loss='log_loss')`, una regresión logística entrenada con descenso por gradiente estocástico.
-- **Cómo se probó:** grilla de `alpha`, `penalty` (`l2` y `l1`) y `class_weight`, con el preprocesamiento de J-71.
-- **Evidencia:** F1 CV de 0,589 ± 0,037 con `alpha=0.0001`, `penalty='l2'` y `class_weight='balanced'`. Es el mayor desvío entre partes de la tabla.
-- **Decisión:** ❌ Descartada
-- **Justificación:** es el mismo modelo que la regresión logística entrenado de otra forma, y queda debajo del umbral.
-
+- **Cómo se probó:** grilla de `alpha`, `penalty` (`l2` y `l1`) y `class_weight`, con el preprocesamiento elegido (J-92).
+- **Evidencia:** F1 CV de 0,660 ± 0,028 con `alpha=0.01`, `penalty='l2'` y `class_weight='balanced'`, con 0,699 en train (0,039 de brecha, la menor de la tabla). Con TF-IDF había dado 0,589 ± 0,037.
+- **Decisión:** ✅ Aprobada, como modelo final
+- **Justificación:** supera el umbral de la tabla completa (0,654) junto con el SVC RBF, y por el desempate de J-93 se elige por ser lineal. Además es el que menos sobreajusta. `alpha=0.01` quedó en el extremo de más regularización de la grilla.
 ### J-84 · KNN
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #39
-- **Propuesta:** probar `KNeighborsClassifier` con distancia coseno, que predice la clase más común entre los tweets de train más parecidos.
-- **Cómo se probó:** grilla de `n_neighbors` (3, 5, 7 y 10), con el preprocesamiento de J-71.
-- **Evidencia:** F1 CV de 0,484 ± 0,023 con `n_neighbors=3`.
+- **Issue / PR:** #46 / #39
+- **Propuesta:** probar `KNeighborsClassifier` con distancia coseno (Clase 7, diapositiva 21), que predice la clase más común entre los tweets de train más parecidos.
+- **Cómo se probó:** grilla de `n_neighbors` (3, 5, 7 y 10), con el preprocesamiento elegido (J-92).
+- **Evidencia:** F1 CV de 0,600 ± 0,009 con `n_neighbors=7` (con TF-IDF había dado 0,484 ± 0,023).
 - **Decisión:** ❌ Descartada
-- **Justificación:** queda 12 puntos debajo del elegido. Como no aprende pesos, todas las palabras cuentan igual para medir el parecido, incluidas las que no dicen nada del sentimiento.
-
+- **Justificación:** queda 6 puntos debajo del elegido. Como no aprende pesos, todas las dimensiones cuentan igual para medir el parecido, aunque no todas tengan que ver con el sentimiento.
 ### J-85 · AdaBoost
 - **Etapa:** 5. Modelado
-- **Issue / PR:** — / #39
+- **Issue / PR:** #46 / #39
 - **Propuesta:** probar `AdaBoostClassifier`, que encadena árboles de un solo corte y le da más peso a los tweets mal clasificados.
-- **Cómo se probó:** grilla de `n_estimators` (50, 100 y 200) y `learning_rate` (0,1, 0,5 y 1), con el preprocesamiento de J-71.
-- **Evidencia:** F1 CV de 0,379 ± 0,023 con 0,395 en train, con `n_estimators=200` y `learning_rate=1.0`, los dos en el extremo de la grilla.
+- **Cómo se probó:** grilla de `n_estimators` (50, 100 y 200) y `learning_rate` (0,1, 0,5 y 1), con el preprocesamiento elegido (J-92).
+- **Evidencia:** F1 CV de 0,593 ± 0,013 con 0,652 en train, con `n_estimators=200` y `learning_rate=1.0`, los dos en el extremo de la grilla (con TF-IDF había dado 0,379).
 - **Decisión:** ❌ Descartada
-- **Justificación:** es el peor de la tabla y no llega a aprender ni train. Con 200 árboles de un solo corte usa a lo sumo 200 de las 3398 columnas. Con más árboles podría subir algo, pero queda 22 puntos debajo del elegido.
-
+- **Justificación:** queda entre los peores de la tabla. Con más árboles podría subir algo, pero queda 7 puntos debajo del elegido.
 ## 6. Evaluación
 
 ### J-86 · Optimizar el F1 macro
 - **Etapa:** 6. Evaluación
-- **Issue / PR:** #19 / #41
+- **Issue / PR:** #19, #46 / #41
 - **Propuesta:** usar el F1 macro como métrica a optimizar, porque pesa igual las tres clases y en cada una combina precisión y recall.
-- **Cómo se probó:** validación cruzada del modelo ingenuo y del modelo elegido (J-71) con accuracy, balanced accuracy, F1 ponderado y F1 macro, comparando cuánto sube cada métrica de un modelo al otro.
-- **Evidencia:** el F1 macro pasa de 0,268 a 0,600, la mayor diferencia de las cuatro métricas (0,332).
+- **Cómo se probó:** validación cruzada del modelo ingenuo y del modelo elegido (J-83) con accuracy, balanced accuracy, F1 ponderado y F1 macro, comparando cuánto sube cada métrica de un modelo al otro.
+- **Evidencia:** el F1 macro pasa de 0,268 a 0,660, la mayor diferencia de las cuatro métricas (0,392).
 - **Decisión:** ✅ Aprobada
 - **Justificación:** es la que mejor separa un modelo que aprende de uno que no. P y N son las clases minoritarias, pero son las que dicen cómo se percibe la IA, y con el F1 macro cuentan lo mismo que NEU. Es la métrica que se usó en todo el modelado.
-
 ### J-87 · Optimizar la accuracy
 - **Etapa:** 6. Evaluación
-- **Issue / PR:** #19 / #41
+- **Issue / PR:** #19, #46 / #41
 - **Propuesta:** usar la proporción de tweets bien clasificados.
 - **Cómo se probó:** igual que J-86.
-- **Evidencia:** el modelo ingenuo llega a 0,673 y el elegido a 0,666 (0,8 puntos menos).
+- **Evidencia:** el modelo ingenuo llega a 0,673 y el elegido a 0,739 (6,5 puntos más), la menor diferencia de las cuatro métricas.
 - **Decisión:** ❌ Descartada
-- **Justificación:** con dos tercios de los tweets en NEU, predecir siempre NEU da más accuracy que el modelo elegido. Optimizarla favorecería modelos que ignoran P y N.
-
+- **Justificación:** con dos tercios de los tweets en NEU, predecir siempre NEU ya da 0,673, y la métrica depende sobre todo de acertar los neutrales. Optimizarla favorecería modelos que ignoran P y N.
 ### J-88 · Optimizar el F1 ponderado
 - **Etapa:** 6. Evaluación
-- **Issue / PR:** #19 / #41
+- **Issue / PR:** #19, #46 / #41
 - **Propuesta:** promediar el F1 de cada clase pesado por su cantidad de tweets.
 - **Cómo se probó:** igual que J-86.
-- **Evidencia:** el modelo ingenuo llega a 0,542 sin acertar ningún P ni N, y el elegido a 0,677 (0,135 más).
+- **Evidencia:** el modelo ingenuo llega a 0,542 sin acertar ningún P ni N, y el elegido a 0,738 (0,196 más).
 - **Decisión:** ❌ Descartada
 - **Justificación:** NEU pesa dos tercios del promedio, así que la métrica depende sobre todo de esa clase y achica la mejora en P y N.
-
 ### J-89 · Optimizar la balanced accuracy
 - **Etapa:** 6. Evaluación
-- **Issue / PR:** #19 / #41
+- **Issue / PR:** #19, #46 / #41
 - **Propuesta:** promediar el recall de las tres clases, que también pesa igual cada clase.
 - **Cómo se probó:** igual que J-86.
-- **Evidencia:** pasa de 0,333 en el modelo ingenuo a 0,636 en el elegido (0,302 más).
+- **Evidencia:** pasa de 0,333 en el modelo ingenuo a 0,660 en el elegido (0,327 más).
 - **Decisión:** ❌ Descartada
 - **Justificación:** solo mira el recall, así que no castiga los tweets que el modelo marca como P o N sin serlo. Para etiquetar tweets nuevos esos errores inflarían la cantidad de opiniones positivas o negativas. El F1 macro tiene en cuenta los dos tipos de error.
-
 ### J-90 · Evaluar en test una sola vez, con el modelo elegido entrenado con todo train
 - **Etapa:** 6. Evaluación
-- **Issue / PR:** #20 / #41
-- **Propuesta:** entrenar el modelo elegido (J-71) con todo train y evaluarlo en test una sola vez, con `classification_report`, matriz de confusión y ejemplos de tweets mal clasificados, para estimar cómo andaría con tweets nuevos.
+- **Issue / PR:** #20, #46 / #41
+- **Propuesta:** entrenar el modelo elegido (J-83) con todo train y evaluarlo en test una sola vez, con `classification_report`, matriz de confusión y ejemplos de tweets mal clasificados, para estimar cómo andaría con tweets nuevos.
 - **Cómo se probó:** F1 macro en test contra el de validación cruzada, métricas por clase, conteo de errores entre P y N, y dos ejemplos al azar por cada combinación de clase real y predicha.
-- **Evidencia:** F1 macro de 0,580 en test, contra 0,600 ± 0,012 en CV. Precisión y recall de 0,49 y 0,63 en P, 0,82 y 0,65 en NEU, y 0,38 y 0,60 en N. De los 288 errores, solo 22 (7,6%) son entre P y N.
+- **Evidencia:** F1 macro de 0,679 en test, contra 0,660 ± 0,028 en CV. Precisión y recall de 0,70 y 0,63 en P, 0,82 y 0,82 en NEU, y 0,52 y 0,58 en N. De los 196 errores, solo 8 (4,1%) son entre P y N.
 - **Decisión:** ✅ Aprobada
-- **Justificación:** test no se usó para ninguna decisión, así que su F1 es una estimación honesta, y queda cerca del de CV. El modelo casi no confunde P con N: su dificultad es separar los tweets con opinión de los neutrales, y por `class_weight='balanced'` marca como P o N a muchos neutrales. Los ejemplos muestran errores por falta de contexto (respuestas), ironía y etiquetas discutibles.
-
+- **Justificación:** test no se usó para ninguna decisión, así que su F1 es una estimación honesta, y queda dentro del desvío de CV. El modelo casi no confunde P con N: su dificultad es separar los tweets con opinión de los neutrales, y la clase más difícil es N. Los ejemplos muestran errores por falta de contexto (respuestas), ironía y etiquetas discutibles.
 ### J-91 · Comparar los finalistas en test sin cambiar la elección
 - **Etapa:** 6. Evaluación
-- **Issue / PR:** #21 / #41
-- **Propuesta:** resumir la comparación de las 16 variantes en un gráfico de F1 CV ± desvío con el umbral de la regla de un desvío, y evaluar en test, solo como referencia, las dos variantes con mayor F1 CV (J-74 y J-80) junto con el modelo elegido y el ingenuo.
+- **Issue / PR:** #21, #46 / #41
+- **Propuesta:** resumir la comparación de las 17 variantes en un gráfico de F1 CV ± desvío con el umbral de la regla de un desvío, y evaluar en test, solo como referencia, las dos variantes con mayor F1 CV además del elegido (el SVC RBF y el `LinearSVC` de J-79), junto con el modelo ingenuo.
 - **Cómo se probó:** cada finalista se entrena con todo train y sus mejores parámetros de CV, y se compara su F1 macro y su F1 por clase en test.
-- **Evidencia:** F1 macro en test de 0,580 para el elegido (0,600 en CV), 0,613 para palabras + caracteres (0,610 en CV), 0,617 para la votación (0,607 en CV) y 0,268 para el modelo ingenuo. La diferencia está sobre todo en P (0,554 contra 0,595 y 0,583) y NEU (0,723 contra 0,767 y 0,780).
+- **Evidencia:** F1 macro en test de 0,679 para el elegido (0,660 en CV), 0,690 para el SVC RBF (0,672 en CV), 0,668 para el `LinearSVC` (0,654 en CV) y 0,268 para el modelo ingenuo. La mayor diferencia entre el SVC RBF y el elegido está en N (0,576 contra 0,544).
 - **Decisión:** ✅ Aprobada, sin cambiar el modelo elegido
-- **Justificación:** la elección se hizo con validación cruzada antes de mirar test, y elegir ahora por test haría que su F1 dejara de ser una estimación para tweets nuevos. El resultado indica que la regla de un desvío (J-70) pudo resignar algo de desempeño a cambio de simplicidad, y queda como punto a revisar con más datos o con más repeticiones de la validación cruzada.
+- **Justificación:** la elección se hizo con validación cruzada antes de mirar test, y elegir ahora por test haría que su F1 dejara de ser una estimación para tweets nuevos. Por eso, aunque el SVC RBF supera al elegido en test por 1,1 puntos, la elección no cambia.

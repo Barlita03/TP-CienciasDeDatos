@@ -47,6 +47,7 @@ Para cada elemento: decidir si se elimina, se transforma, se construye una featu
 - [x] Support Vector Machines ([#16](https://github.com/Barlita03/TP-CienciasDeDatos/issues/16))
 - [x] Investigar y ajustar los hiperparámetros de cada modelo ([#17](https://github.com/Barlita03/TP-CienciasDeDatos/issues/17))
 - [x] Analizar cómo escala SVM con la cantidad de features ([#18](https://github.com/Barlita03/TP-CienciasDeDatos/issues/18))
+- [ ] Probar embeddings como representación del texto ([#46](https://github.com/Barlita03/TP-CienciasDeDatos/issues/46))
 
 ## 6. Evaluación
 
