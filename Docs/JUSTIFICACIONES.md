@@ -597,7 +597,7 @@ La evidencia de esta etapa y de la siguiente se calcula sobre el train set (J-55
 - **Issue / PR:** #37 / #39
 - **Propuesta:** pasar cada palabra a su forma de diccionario con el modelo `es_core_news_sm` de spaCy, a partir del texto sin stopwords, en la columna `texto_lemma`. Se desactivan el parser y el reconocimiento de entidades, se evita que spaCy vuelva a tokenizar, y `urltoken` y `usertoken` no se modifican.
 - **Cómo se probó:** mismo análisis que J-62. Queda por validar en el modelado, con validación cruzada (J-55) y la métrica que se defina.
-- **Evidencia:** la lematización baja las palabras distintas de 11778 a 8867 (un 24,7% menos). Con `min_df=2` quedan 3823. En un tweet de ejemplo, `puede` queda como `poder`.
+- **Evidencia:** la lematización baja las palabras distintas de 11778 a 9276 (un 21,2% menos). Con `min_df=2` quedan 3947. En un tweet de ejemplo, `puede` queda como `poder`.
 - **Decisión:** ✅ Aprobada, como candidata (se compara con J-62 y J-64 en el modelado)
 - **Justificación:** reduce menos el vocabulario que el stemming, pero deja palabras reales (`poder`), más fáciles de leer e interpretar. Una limitación: se aplica sobre el texto sin stopwords (J-60), así que spaCy analiza oraciones incompletas y puede equivocarse más que con la oración entera. En el modelado quedó debajo del stemming y se descartó (J-72).
 

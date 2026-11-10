@@ -18,6 +18,7 @@ Línea de tiempo de los cambios del proyecto.
 
 ---
 ## 2026-11-09
+- Suma al notebook las justificaciones que solo estaban en JUSTIFICACIONES.md, saca las referencias `J-XX` y corrige el vocabulario de la lematización según la salida actual (#)
 - Agrega embeddings de oraciones como representación del texto y los elige con la regla de un desvío (#)
 - Ajusta la regla de un desvío: los embeddings cuentan como la variante más compleja y, a igual cantidad de columnas, se prefiere un modelo lineal (#)
 - Vuelve a evaluar los clasificadores 8 a 17 sobre embeddings y elige SGD como modelo final; ComplementNB queda como no aplicable y la votación usa GaussianNB (#)
